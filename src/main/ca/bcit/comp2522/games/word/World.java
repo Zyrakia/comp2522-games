@@ -1,5 +1,6 @@
 package ca.bcit.comp2522.games.word;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +28,14 @@ public class World {
         this.countries = World.mapCountriesByName(countries);
     }
 
+    /**
+     * Validates the given list of countries to ensure it is within limits.
+     *
+     * @param countries the list of countries to validate
+     */
     private static void validateCountries(final List<Country> countries) {
         if (countries == null || countries.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "A world must have at least one country.");
+            throw new IllegalArgumentException("A world must have at least one country.");
         }
     }
 
@@ -51,8 +56,7 @@ public class World {
 
             if (nameToCountry.containsKey(name)) {
                 throw new IllegalArgumentException(
-                        "The country name \"" + name +
-                                "\" is duplicate in the list of countries.");
+                        "The country name \"" + name + "\" is duplicate in the list of countries.");
             }
 
             nameToCountry.put(name, country);
@@ -67,7 +71,7 @@ public class World {
      * @return the countries
      */
     public final Map<String, Country> getCountries() {
-
+        return Collections.unmodifiableMap(this.countries);
     }
 
 }
