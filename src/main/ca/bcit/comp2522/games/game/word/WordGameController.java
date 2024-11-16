@@ -1,4 +1,6 @@
-package ca.bcit.comp2522.games.word;
+package ca.bcit.comp2522.games.game.word;
+
+import ca.bcit.comp2522.games.game.GameController;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,13 +15,20 @@ import java.util.List;
  * @author Ole Lammers
  * @version 1.0
  */
-public class WordGame {
+public final class WordGameController extends GameController {
 
     private static final String DATA_FILE_EXTENSION = "txt";
     private static final String[] DATA_FILE_NAMES = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
                                                       "n", "o", "p", "q", "r", "s", "t", "u", "v", "y", "z" };
 
-    private static final World WORLD = WordGame.loadWorld();
+    private static final World WORLD = WordGameController.loadWorld();
+
+    /**
+     * Creates a new word game controller.
+     */
+    public WordGameController() {
+        super("Country Guesser", "Guess countries based off of facts and their capital city!");
+    }
 
     /**
      * Loads all country data files, decodes all countries inside them, and creates a world with those countries.
@@ -30,15 +39,15 @@ public class WordGame {
         final List<Country> countries;
         countries = new ArrayList<>();
 
-        for (final String fileName : WordGame.DATA_FILE_NAMES) {
+        for (final String fileName : WordGameController.DATA_FILE_NAMES) {
             final String fileNameWithExtension;
             final Path filePath;
 
-            fileNameWithExtension = String.format("%s.%s", fileName, WordGame.DATA_FILE_EXTENSION);
+            fileNameWithExtension = String.format("%s.%s", fileName, WordGameController.DATA_FILE_EXTENSION);
             filePath = Path.of("src", "resources", fileNameWithExtension);
 
             try {
-                countries.addAll(WordGame.loadCountriesFromFile(filePath));
+                countries.addAll(WordGameController.loadCountriesFromFile(filePath));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -68,22 +77,31 @@ public class WordGame {
         final String[] countryBlocks;
 
         fileContent = Files.readString(dataFilePath);
-        countryBlocks = fileContent.split(System.lineSeparator().repeat(2));
+        countryBlocks = fileContent.split("\n".repeat(2));
         parsedCountries = new ArrayList<>();
 
-        for (String countryBlock : countryBlocks) {
-            countryBlock = countryBlock.trim();
-            if (countryBlock.isEmpty()) {
+        for (final String rawCountryBlock : countryBlocks) {
+            final String normalizedCountryBlock;
+            normalizedCountryBlock = rawCountryBlock.trim();
+
+            if (normalizedCountryBlock.isEmpty()) {
                 continue;
             }
 
-            final Country country;
-            country = Country.decodeFromBlock(countryBlock);
-
-            parsedCountries.add(country);
+            parsedCountries.add(Country.decodeFromBlock(normalizedCountryBlock));
         }
 
         return parsedCountries;
+    }
+
+    @Override
+    protected void onStart() {
+        System.out.println("Word game!");
+    }
+
+    @Override
+    protected void onFinish() {
+        System.out.println("Word game finished!");
     }
 
 }

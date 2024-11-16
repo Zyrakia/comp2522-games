@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.games.word;
+package ca.bcit.comp2522.games.game.word;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Ole Lammers
  * @version 1.0
  */
-public class World {
+public final class World {
 
     /**
      * Maps country names to associated {@link Country} instances.
@@ -70,7 +70,7 @@ public class World {
      *
      * @return the countries
      */
-    public final Map<String, Country> getCountries() {
+    public Map<String, Country> getCountries() {
         return Collections.unmodifiableMap(this.countries);
     }
 

@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.games.word;
+package ca.bcit.comp2522.games.game.word;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * @author Ole Lammers
  * @version 1.0
  */
-public class Country {
+public final class Country {
 
     /**
      * The minimum amount of facts a country must have defined to be valid.
@@ -73,11 +73,13 @@ public class Country {
      * @return the decoded country
      */
     public static Country decodeFromBlock(final String encodedBlock) {
-        final String[] lines = encodedBlock.split(System.lineSeparator());
+        final String[] lines = encodedBlock.split("\n");
 
+        // Check if there is at least one fact, and one line for the header
         if (lines.length < Country.MIN_FACTS + 1) {
             throw new IllegalArgumentException(
-                    "Each encoded country must have a name, capital name, and at least one fact.");
+                    "Each encoded country must have a name, capital name, and at least one fact. Erroneous block: \n" +
+                            encodedBlock);
         }
 
         final String firstLine;
@@ -88,10 +90,11 @@ public class Country {
 
         firstLine = lines[0];
 
-        if (!lines[0].contains(Country.NAME_CAPITAL_SEP)) {
+        if (!firstLine.contains(Country.NAME_CAPITAL_SEP)) {
             throw new IllegalArgumentException(
                     "The encoded country header \"" + firstLine + "\" does not contain a name and a capital name.");
         }
+
         // First line will be joined country and capital name
         countryAndCapitalName = firstLine.split(Country.NAME_CAPITAL_SEP);
         countryName = countryAndCapitalName[0];
@@ -110,7 +113,7 @@ public class Country {
      *
      * @return the country name
      */
-    public final String getName() {
+    public String getName() {
         return this.name;
     }
 
@@ -119,7 +122,7 @@ public class Country {
      *
      * @return the capital city name
      */
-    public final String getCapitalCityName() {
+    public String getCapitalCityName() {
         return this.capitalCityName;
     }
 
@@ -128,7 +131,7 @@ public class Country {
      *
      * @return a readonly of the facts
      */
-    public final List<String> getFacts() {
+    public List<String> getFacts() {
         return List.of(this.facts);
     }
 
