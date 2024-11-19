@@ -1,11 +1,12 @@
 package ca.bcit.comp2522.games;
 
 import ca.bcit.comp2522.games.game.GameController;
+import ca.bcit.comp2522.games.game.quit.QuitGameController;
 import ca.bcit.comp2522.games.game.word.WordGameController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -15,11 +16,6 @@ import java.util.Map;
  * @version 1.0
  */
 public final class Main extends Application {
-
-    /**
-     * Maps input characters to their associated game controllers.
-     */
-    private final Map<Character, GameController> games = new HashMap<>();
 
     /**
      * Entry point for the COMP2522 term project driver class.
@@ -32,9 +28,27 @@ public final class Main extends Application {
 
     @Override
     public void start(final Stage primaryStage) {
-        this.games.put('w', new WordGameController());
-        this.games.get('w').launch();
-    }
+        final Map<Character, GameController> games;
+        final GameMenu menu;
 
+        // Linked in order to preserve order within the menu text
+        games = new LinkedHashMap<>();
+
+        games.put('w', new WordGameController());
+        games.put('q', new QuitGameController());
+
+        menu = new GameMenu(games);
+
+        while (true) {
+            final GameController nextGame;
+            nextGame = menu.promptChoice();
+
+            if (nextGame == null) {
+                break;
+            }
+
+            nextGame.launch();
+        }
+    }
 
 }
