@@ -3,7 +3,6 @@ package ca.bcit.comp2522.games;
 import ca.bcit.comp2522.games.game.GameController;
 
 import java.util.Map;
-import java.util.Scanner;
 
 /**
  * Represents a terminal-input based menu to select which game should be played.
@@ -13,7 +12,6 @@ import java.util.Scanner;
  */
 public final class GameMenu {
 
-    private static final Scanner SCANNER = new Scanner(System.in);
     private static final int INVALID_INPUT_FLAG = -1;
 
     private static final int DIVIDER_WIDTH = 80;
@@ -101,7 +99,7 @@ public final class GameMenu {
         final int expectedLength = 1;
 
         final String input;
-        input = GameMenu.SCANNER.nextLine().trim();
+        input = Main.SCANNER.nextLine().trim();
 
         if (input.isBlank() || input.length() != expectedLength) {
             return GameMenu.INVALID_INPUT_FLAG;

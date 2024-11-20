@@ -1,7 +1,5 @@
 package ca.bcit.comp2522.games.game.word;
 
-import java.util.List;
-
 /**
  * Represents a country and various details of that country.
  *
@@ -127,12 +125,12 @@ public final class Country {
     }
 
     /**
-     * Returns a copy of the facts relating to this country.
+     * Returns facts about this country.
      *
-     * @return a readonly of the facts
+     * @return the facts
      */
-    public List<String> getFacts() {
-        return List.of(this.facts);
+    public String[] getFacts() {
+        return this.facts;
     }
 
 }

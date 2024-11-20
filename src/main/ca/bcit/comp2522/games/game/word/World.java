@@ -1,9 +1,10 @@
 package ca.bcit.comp2522.games.game.word;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Represents a geographical world with multiple countries.
@@ -66,12 +67,21 @@ public final class World {
     }
 
     /**
-     * Obtains the list of countries within this world.
+     * Returns a random country out of the countries within this world.
      *
-     * @return the countries
+     * @return a random country
      */
-    public Map<String, Country> getCountries() {
-        return Collections.unmodifiableMap(this.countries);
+    public Country getRandomCountry() {
+        final Random random;
+        final List<Country> countries;
+        final Country country;
+
+        random = new Random();
+        countries = new ArrayList<>(this.countries.values());
+        country = countries.get(random.nextInt(countries.size()));
+
+        return country;
     }
+
 
 }

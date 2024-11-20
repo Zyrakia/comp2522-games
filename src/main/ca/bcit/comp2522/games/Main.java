@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * This is the driver class for the COMP2522 term project.
@@ -16,6 +17,11 @@ import java.util.Map;
  * @version 1.0
  */
 public final class Main extends Application {
+
+    /**
+     * A global scanner object that is closed when the game is done.
+     */
+    public static final Scanner SCANNER = new Scanner(System.in);
 
     /**
      * Entry point for the COMP2522 term project driver class.
@@ -49,6 +55,8 @@ public final class Main extends Application {
 
             nextGame.launch();
         }
+
+        Main.SCANNER.close();
     }
 
 }

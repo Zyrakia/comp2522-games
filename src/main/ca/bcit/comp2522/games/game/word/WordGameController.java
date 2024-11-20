@@ -1,12 +1,19 @@
 package ca.bcit.comp2522.games.game.word;
 
+import ca.bcit.comp2522.games.Main;
 import ca.bcit.comp2522.games.game.GameController;
+import ca.bcit.comp2522.games.game.word.question.CountryQuestion;
+import ca.bcit.comp2522.games.game.word.question.GuessCapitalGivenCountryQuestion;
+import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenCapitalQuestion;
+import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenFactQuestion;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.function.Function;
 
 /**
  * The controller for the first game, the word game. This game has the user
@@ -22,6 +29,16 @@ public final class WordGameController extends GameController {
                                                       "n", "o", "p", "q", "r", "s", "t", "u", "v", "y", "z" };
 
     private static final World WORLD = WordGameController.loadWorld();
+    private static final int QUESTIONS_PER_GAME = 10;
+    private static final int ATTEMPTS_PER_QUESTION = 2;
+
+    private static final List<Function<Country, CountryQuestion>> QUESTION_PROVIDERS = new ArrayList<>();
+
+    static {
+        WordGameController.QUESTION_PROVIDERS.add(GuessCountryGivenCapitalQuestion::new);
+        WordGameController.QUESTION_PROVIDERS.add(GuessCapitalGivenCountryQuestion::new);
+        WordGameController.QUESTION_PROVIDERS.add(GuessCountryGivenFactQuestion::new);
+    }
 
     /**
      * Creates a new word game controller.
@@ -94,14 +111,102 @@ public final class WordGameController extends GameController {
         return parsedCountries;
     }
 
+    /**
+     * Returns a random question type from the available question providers that is based on the given country.
+     *
+     * @param country the country to base the question off of
+     * @return the question based off of the country
+     */
+    private static CountryQuestion getQuestionOf(final Country country) {
+        if (WordGameController.QUESTION_PROVIDERS.isEmpty()) {
+            throw new IllegalStateException(
+                    "At least one question provider must be present in order for a question to be created for a " +
+                            "country.");
+        }
+
+        final Random rand;
+        final int providerCount;
+        final int chosenIndex;
+
+        rand = new Random();
+        providerCount = WordGameController.QUESTION_PROVIDERS.size();
+        chosenIndex = rand.nextInt(providerCount);
+
+        return WordGameController.QUESTION_PROVIDERS.get(chosenIndex).apply(country);
+    }
+
     @Override
     protected void onStart() {
-        System.out.println("Word game!");
+        // TODO ask to play again after played
+        this.playGame();
+    }
+
+    /**
+     * Plays a game that prompts the user for {@value WordGameController#QUESTIONS_PER_GAME} questions, and record
+     * the result in a file.
+     */
+    private void playGame() {
+        int answeredTotal = 0;
+        int answeredCorrectTotal = 0;
+
+        while (answeredTotal < WordGameController.QUESTIONS_PER_GAME) {
+            final Country country;
+            final CountryQuestion question;
+            final boolean answerCorrect;
+
+            country = WordGameController.WORLD.getRandomCountry();
+            question = WordGameController.getQuestionOf(country);
+            answerCorrect = this.askQuestion(answeredTotal, question);
+
+            if (answerCorrect) answeredCorrectTotal++;
+            answeredTotal++;
+        }
+
+        // TODO track second attempt guesses
+        // TODO save score entry into class wide score tracker
+        // TODO print current state of class wide score tracker
+        System.out.println("Answered correctly " + answeredCorrectTotal + " out of " + answeredTotal + " total.");
+    }
+
+    /**
+     * Prompts the user for the specified question, and returns whether they entered a correct answer or not.
+     *
+     * @param questionIndex the index of the question, used for the prompt
+     * @param question      the question to ask
+     * @return the validity of the answer given by the user
+     */
+    private boolean askQuestion(final int questionIndex, final CountryQuestion question) {
+        int attempts = 0;
+
+        System.out.println(System.lineSeparator() + "Question " + (questionIndex + 1) + ". " + question.getQuestion());
+        System.out.print("Enter your answer: ");
+
+        while (attempts < WordGameController.ATTEMPTS_PER_QUESTION) {
+            final String givenAnswer;
+            final boolean answerCorrect;
+
+            givenAnswer = Main.SCANNER.nextLine();
+            answerCorrect = question.isValidAnswer(givenAnswer);
+
+            attempts++;
+
+            if (answerCorrect) {
+                System.out.println("Correct answer, great job!");
+                return true;
+            } else if (attempts == WordGameController.ATTEMPTS_PER_QUESTION) {
+                System.out.println("Incorrect, the answer was \"" + question.getAnswer() + "\"!");
+            } else {
+                System.out.print("Incorrect answer, try again: ");
+            }
+        }
+
+        return false;
     }
 
     @Override
     protected void onFinish() {
-        System.out.println("Word game finished!");
+        // TODO save global score tracker to file
+        // TODO reset global score tracker
     }
 
 }
