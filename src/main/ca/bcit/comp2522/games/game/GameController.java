@@ -1,12 +1,14 @@
 package ca.bcit.comp2522.games.game;
 
+import ca.bcit.comp2522.games.MenuItem;
+
 /**
  * Represents a game that can be played within this application.
  *
  * @author Ole Lammers
  * @version 1.0
  */
-public abstract class GameController {
+public abstract class GameController implements MenuItem {
 
     private final String name;
     private final String description;
@@ -62,6 +64,7 @@ public abstract class GameController {
      *
      * @return the name
      */
+    @Override
     public final String getName() {
         return this.name;
     }
@@ -71,6 +74,7 @@ public abstract class GameController {
      *
      * @return the description
      */
+    @Override
     public final String getDescription() {
         return this.description;
     }

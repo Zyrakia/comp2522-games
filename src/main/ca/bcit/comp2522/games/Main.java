@@ -34,29 +34,41 @@ public final class Main extends Application {
 
     @Override
     public void start(final Stage primaryStage) {
-        final Map<Character, GameController> games;
-        final GameMenu menu;
+        final Map<String, GameController> games;
+        final TerminalMenu<GameController> menu;
+
+        games = this.loadGames();
+        menu = new TerminalMenu<>(games);
+
+        while (true) {
+            final GameController nextGameName;
+            nextGameName = menu.promptChoice();
+
+            if (nextGameName == null) {
+                break;
+            }
+
+            nextGameName.launch();
+        }
+
+        Main.SCANNER.close();
+    }
+
+    /**
+     * Loads games into a map and returns the map.
+     *
+     * @return the map containing all the games and their activation strings
+     */
+    private Map<String, GameController> loadGames() {
+        final Map<String, GameController> games;
 
         // Linked in order to preserve order within the menu text
         games = new LinkedHashMap<>();
 
-        games.put('w', new WordGameController());
-        games.put('q', new QuitGameController());
+        games.put("W", new WordGameController());
+        games.put("Q", new QuitGameController());
 
-        menu = new GameMenu(games);
-
-        while (true) {
-            final GameController nextGame;
-            nextGame = menu.promptChoice();
-
-            if (nextGame == null) {
-                break;
-            }
-
-            nextGame.launch();
-        }
-
-        Main.SCANNER.close();
+        return games;
     }
 
 }
