@@ -6,12 +6,17 @@ import ca.bcit.comp2522.games.game.word.question.CountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCapitalGivenCountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenCapitalQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenFactQuestion;
+import ca.bcit.comp2522.games.menu.TerminalMenu;
+import ca.bcit.comp2522.games.menu.item.MenuItem;
+import ca.bcit.comp2522.games.menu.item.NoMenuItem;
+import ca.bcit.comp2522.games.menu.item.YesMenuItem;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 
@@ -137,8 +142,19 @@ public final class WordGameController extends GameController {
 
     @Override
     protected void onStart() {
-        // TODO ask to play again after played
-        this.playGame();
+        final TerminalMenu<MenuItem> menu;
+        menu = new TerminalMenu<>("Do you want to play again?",
+                                  Map.of("Yes", new YesMenuItem(), "No", new NoMenuItem()));
+
+        boolean cont = true;
+        while (cont) {
+            final MenuItem choice;
+
+            this.playGame();
+
+            choice = menu.promptChoice();
+            cont = choice instanceof YesMenuItem;
+        }
     }
 
     /**

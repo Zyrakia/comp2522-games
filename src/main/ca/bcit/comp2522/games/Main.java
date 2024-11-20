@@ -3,6 +3,7 @@ package ca.bcit.comp2522.games;
 import ca.bcit.comp2522.games.game.GameController;
 import ca.bcit.comp2522.games.game.quit.QuitGameController;
 import ca.bcit.comp2522.games.game.word.WordGameController;
+import ca.bcit.comp2522.games.menu.TerminalMenu;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -38,7 +39,7 @@ public final class Main extends Application {
         final TerminalMenu<GameController> menu;
 
         games = this.loadGames();
-        menu = new TerminalMenu<>(games);
+        menu = new TerminalMenu<>("Which game would you like to play?", games);
 
         while (true) {
             final GameController nextGameName;

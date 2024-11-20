@@ -1,4 +1,7 @@
-package ca.bcit.comp2522.games;
+package ca.bcit.comp2522.games.menu;
+
+import ca.bcit.comp2522.games.Main;
+import ca.bcit.comp2522.games.menu.item.MenuItem;
 
 import java.util.Map;
 
@@ -15,20 +18,30 @@ public final class TerminalMenu<T extends MenuItem> {
     private static final String DIVIDER = "—".repeat(TerminalMenu.DIVIDER_WIDTH).concat(System.lineSeparator());
 
     private final Map<String, T> items;
+    private final String title;
     private final String menuText;
     private boolean isPrompting;
 
     /**
      * Creates a new menu with the specified items as options.
      *
+     * @param title the title of the menu
      * @param items the items that can be played
      */
-    public TerminalMenu(final Map<String, T> items) {
+    public TerminalMenu(final String title, final Map<String, T> items) {
+        TerminalMenu.validateTitle(title);
         TerminalMenu.validateItems(items);
 
+        this.title = title;
         this.items = items;
         this.isPrompting = false;
         this.menuText = this.buildMenuText();
+    }
+
+    private static void validateTitle(final String title) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Cannot create a menu without a title.");
+        }
     }
 
     /**
@@ -124,6 +137,7 @@ public final class TerminalMenu<T extends MenuItem> {
 
         result = new StringBuilder();
 
+        result.append(this.title).append(System.lineSeparator());
         result.append(TerminalMenu.DIVIDER);
 
         for (final Map.Entry<String, T> entry : this.items.entrySet()) {
@@ -143,9 +157,12 @@ public final class TerminalMenu<T extends MenuItem> {
             description = item.getDescription();
 
             result.append(name).append(System.lineSeparator());
-            result.append("\t")
-                    .append(description.replace(System.lineSeparator(), "\t".concat(System.lineSeparator())))
-                    .append(System.lineSeparator());
+
+            if (!description.isBlank()) {
+                result.append("\t")
+                        .append(description.replace(System.lineSeparator(), "\t".concat(System.lineSeparator())))
+                        .append(System.lineSeparator());
+            }
         }
 
         result.append(TerminalMenu.DIVIDER);

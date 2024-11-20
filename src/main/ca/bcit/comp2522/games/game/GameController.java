@@ -1,6 +1,6 @@
 package ca.bcit.comp2522.games.game;
 
-import ca.bcit.comp2522.games.MenuItem;
+import ca.bcit.comp2522.games.menu.item.MenuItem;
 
 /**
  * Represents a game that can be played within this application.

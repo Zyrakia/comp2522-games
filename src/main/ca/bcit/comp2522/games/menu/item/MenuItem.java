@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.games;
+package ca.bcit.comp2522.games.menu.item;
 
 /**
  * Represents an option that can be added to a menu.
