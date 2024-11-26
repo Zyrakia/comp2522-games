@@ -7,6 +7,9 @@ import ca.bcit.comp2522.games.game.word.question.CountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCapitalGivenCountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenCapitalQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenFactQuestion;
+import ca.bcit.comp2522.games.game.word.result.FinalAttemptFail;
+import ca.bcit.comp2522.games.game.word.result.FirstAttemptSuccess;
+import ca.bcit.comp2522.games.game.word.result.SecondAttemptSuccess;
 import ca.bcit.comp2522.games.menu.TerminalMenu;
 import ca.bcit.comp2522.games.menu.item.MenuItem;
 import ca.bcit.comp2522.games.menu.item.NoMenuItem;
@@ -38,11 +41,9 @@ public final class WordGameController extends GameController {
     private static final int QUESTIONS_PER_GAME = 10;
     private static final int ATTEMPTS_PER_QUESTION = 2;
 
-    private static final RoundResult FIRST_ATTEMPT_CORRECT_RESULT = new RoundResult(
-            "correct answers on the first attempt", 2);
-    private static final RoundResult SECOND_ATTEMPT_CORRECT_RESULT = new RoundResult(
-            "correct answers on the second attempt", 2);
-    private static final RoundResult INCORRECT_RESULT = new RoundResult("incorrect answers on two attempts each", 0);
+    private static final RoundResult FIRST_ATTEMPT_CORRECT_RESULT = new FirstAttemptSuccess();
+    private static final RoundResult SECOND_ATTEMPT_CORRECT_RESULT = new SecondAttemptSuccess();
+    private static final RoundResult INCORRECT_RESULT = new FinalAttemptFail();
 
     private static final List<Function<Country, CountryQuestion>> QUESTION_PROVIDERS = new ArrayList<>();
 

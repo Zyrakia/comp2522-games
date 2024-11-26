@@ -3,6 +3,7 @@ package ca.bcit.comp2522.games.game.score;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * A class to keep track of various game rounds and their results.
@@ -41,6 +42,60 @@ public final class GameScoreTracker {
         if (gameName == null || gameName.isBlank()) {
             throw new IllegalArgumentException("A game tracker must be associated with a proper game name.");
         }
+    }
+
+    /**
+     * Generates a report string that summarizes the state of this score tracker.
+     *
+     * @param totalFormatter   the provider function for the total games played summary string (the first line), will be
+     *                         provided with the parameter set: ( total rounds played, total points earned )
+     * @param roundFormatter   the provider function for the result of round summary string, will be provided with the
+     *                         parameter set: ( round result instance, result occurrence count )
+     * @param summaryFormatter the provider function for the game summary string (the last list), will be provided
+     *                         with the same parameter set as the total formatter
+     * @return the generated lines joined together
+     */
+    private String generateReport(final BiFunction<Integer, Integer, String> totalFormatter,
+                                  final BiFunction<RoundResult, Integer, String> roundFormatter,
+                                  final BiFunction<Integer, Integer, String> summaryFormatter) {
+        final StringBuilder strResult;
+        final int totalRounds;
+        final int totalPoints;
+
+        strResult = new StringBuilder();
+        totalRounds = this.getTotalRoundsPlayed();
+        totalPoints = this.getTotalPoints();
+
+        if (totalFormatter != null) {
+            final String totalString;
+            totalString = totalFormatter.apply(totalRounds, totalPoints);
+
+            if (totalString != null && !totalString.isBlank()) {
+                strResult.append(totalString).append(System.lineSeparator());
+            }
+        }
+
+        if (roundFormatter != null) {
+            for (final Map.Entry<RoundResult, Integer> entry : this.roundResults.entrySet()) {
+                final String roundString;
+                roundString = roundFormatter.apply(entry.getKey(), entry.getValue());
+
+                if (roundString != null && !roundString.isBlank()) {
+                    strResult.append(roundString).append(System.lineSeparator());
+                }
+            }
+        }
+
+        if (summaryFormatter != null) {
+            final String summaryString;
+            summaryString = summaryFormatter.apply(totalRounds, totalPoints);
+
+            if (summaryString != null && !summaryString.isBlank()) {
+                strResult.append(summaryString).append(System.lineSeparator());
+            }
+        }
+
+        return strResult.toString();
     }
 
     /**
@@ -110,40 +165,6 @@ public final class GameScoreTracker {
                 .stream()
                 .map(entry -> entry.getKey().calculatePoints(entry.getValue()))
                 .reduce(0, Integer::sum);
-    }
-
-    /**
-     * Returns a string representation of all the rounds played and what they each amount to in points.
-     *
-     * @return the string representation of this tracker
-     */
-    @Override
-    public String toString() {
-        final StringBuilder result;
-        final int totalRounds;
-        final int totalPoints;
-
-        result = new StringBuilder();
-        totalRounds = this.getTotalRoundsPlayed();
-        totalPoints = this.getTotalPoints();
-
-        result.append(totalRounds)
-                .append(" ")
-                .append(this.gameName)
-                .append(" games played")
-                .append(System.lineSeparator());
-
-        for (final Map.Entry<RoundResult, Integer> entry : this.roundResults.entrySet()) {
-            final RoundResult result;
-            final int occurrences;
-
-            result = entry.getKey();
-            occurrences = entry.getValue();
-
-            
-        }
-
-        return result.toString();
     }
 
     /**
