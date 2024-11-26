@@ -1,5 +1,6 @@
 package ca.bcit.comp2522.games.game;
 
+import ca.bcit.comp2522.games.game.score.GameScoreTracker;
 import ca.bcit.comp2522.games.menu.item.MenuItem;
 
 /**
@@ -9,6 +10,11 @@ import ca.bcit.comp2522.games.menu.item.MenuItem;
  * @version 1.0
  */
 public abstract class GameController implements MenuItem {
+
+    /**
+     * The score tracker used for every occurence of this game. This is reset before every new game is played.
+     */
+    protected final GameScoreTracker scoreTracker;
 
     private final String name;
     private final String description;
@@ -25,6 +31,7 @@ public abstract class GameController implements MenuItem {
 
         this.name = name;
         this.description = description;
+        this.scoreTracker = new GameScoreTracker(name.toLowerCase());
     }
 
     /**
@@ -45,6 +52,7 @@ public abstract class GameController implements MenuItem {
      * has finished.
      */
     public final synchronized void launch() {
+        this.scoreTracker.reset();
         this.onStart();
         this.onFinish();
     }

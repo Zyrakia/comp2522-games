@@ -2,6 +2,7 @@ package ca.bcit.comp2522.games.game.word;
 
 import ca.bcit.comp2522.games.Main;
 import ca.bcit.comp2522.games.game.GameController;
+import ca.bcit.comp2522.games.game.score.RoundResult;
 import ca.bcit.comp2522.games.game.word.question.CountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCapitalGivenCountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenCapitalQuestion;
@@ -36,6 +37,12 @@ public final class WordGameController extends GameController {
     private static final World WORLD = WordGameController.loadWorld();
     private static final int QUESTIONS_PER_GAME = 10;
     private static final int ATTEMPTS_PER_QUESTION = 2;
+
+    private static final RoundResult FIRST_ATTEMPT_CORRECT_RESULT = new RoundResult(
+            "correct answers on the first attempt", 2);
+    private static final RoundResult SECOND_ATTEMPT_CORRECT_RESULT = new RoundResult(
+            "correct answers on the second attempt", 2);
+    private static final RoundResult INCORRECT_RESULT = new RoundResult("incorrect answers on two attempts each", 0);
 
     private static final List<Function<Country, CountryQuestion>> QUESTION_PROVIDERS = new ArrayList<>();
 
@@ -162,26 +169,23 @@ public final class WordGameController extends GameController {
      * the result in a file.
      */
     private void playGame() {
-        int answeredTotal = 0;
-        int answeredCorrectTotal = 0;
+        int totalRounds = 0;
 
-        while (answeredTotal < WordGameController.QUESTIONS_PER_GAME) {
+        while (totalRounds < WordGameController.QUESTIONS_PER_GAME) {
             final Country country;
             final CountryQuestion question;
-            final boolean answerCorrect;
+            final RoundResult questionResult;
 
             country = WordGameController.WORLD.getRandomCountry();
             question = WordGameController.getQuestionOf(country);
-            answerCorrect = this.askQuestion(answeredTotal, question);
+            questionResult = this.askQuestion(totalRounds, question);
 
-            if (answerCorrect) answeredCorrectTotal++;
-            answeredTotal++;
+            this.scoreTracker.reportRound(questionResult);
+            totalRounds++;
         }
 
-        // TODO track second attempt guesses
-        // TODO save score entry into class wide score tracker
         // TODO print current state of class wide score tracker
-        System.out.println("Answered correctly " + answeredCorrectTotal + " out of " + answeredTotal + " total.");
+        System.out.println("TEMP: played " + totalRounds + " rounds");
     }
 
     /**
@@ -191,7 +195,7 @@ public final class WordGameController extends GameController {
      * @param question      the question to ask
      * @return the validity of the answer given by the user
      */
-    private boolean askQuestion(final int questionIndex, final CountryQuestion question) {
+    private RoundResult askQuestion(final int questionIndex, final CountryQuestion question) {
         int attempts = 0;
 
         System.out.println(System.lineSeparator() + "Question " + (questionIndex + 1) + ". " + question.getQuestion());
@@ -208,7 +212,12 @@ public final class WordGameController extends GameController {
 
             if (answerCorrect) {
                 System.out.println("Correct answer, great job!");
-                return true;
+
+                if (attempts >= WordGameController.ATTEMPTS_PER_QUESTION) {
+                    return WordGameController.SECOND_ATTEMPT_CORRECT_RESULT;
+                } else {
+                    return WordGameController.FIRST_ATTEMPT_CORRECT_RESULT;
+                }
             } else if (attempts == WordGameController.ATTEMPTS_PER_QUESTION) {
                 System.out.println("Incorrect, the answer was \"" + question.getAnswer() + "\"!");
             } else {
@@ -216,13 +225,15 @@ public final class WordGameController extends GameController {
             }
         }
 
-        return false;
+        return WordGameController.INCORRECT_RESULT;
     }
 
     @Override
     protected void onFinish() {
+        // TODO print total amount of games played
+        // TODO save high score
+        // TODO report high score status
         // TODO save global score tracker to file
-        // TODO reset global score tracker
     }
 
 }
