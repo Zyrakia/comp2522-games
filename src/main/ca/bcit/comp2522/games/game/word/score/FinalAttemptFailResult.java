@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.games.game.word.result;
+package ca.bcit.comp2522.games.game.word.score;
 
 import ca.bcit.comp2522.games.game.score.RoundResult;
 
@@ -8,12 +8,12 @@ import ca.bcit.comp2522.games.game.score.RoundResult;
  * @author Ole Lammers
  * @version 1.0
  */
-public final class FinalAttemptFail extends RoundResult {
+public final class FinalAttemptFailResult extends RoundResult {
 
     /**
      * Creates a result that describes the user not getting the correct answer for a question at all.
      */
-    public FinalAttemptFail() {
+    public FinalAttemptFailResult() {
         super(0);
     }
 

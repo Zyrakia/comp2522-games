@@ -2,14 +2,18 @@ package ca.bcit.comp2522.games.game.word;
 
 import ca.bcit.comp2522.games.Main;
 import ca.bcit.comp2522.games.game.GameController;
+import ca.bcit.comp2522.games.game.score.GameSessionScore;
 import ca.bcit.comp2522.games.game.score.RoundResult;
 import ca.bcit.comp2522.games.game.word.question.CountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCapitalGivenCountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenCapitalQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenFactQuestion;
-import ca.bcit.comp2522.games.game.word.result.FinalAttemptFail;
-import ca.bcit.comp2522.games.game.word.result.FirstAttemptSuccess;
-import ca.bcit.comp2522.games.game.word.result.SecondAttemptSuccess;
+import ca.bcit.comp2522.games.game.word.score.FinalAttemptFailResult;
+import ca.bcit.comp2522.games.game.word.score.FirstAttemptSuccessResult;
+import ca.bcit.comp2522.games.game.word.score.PersistentWordGameSummarizer;
+import ca.bcit.comp2522.games.game.word.score.PostGameWordGameSummarizer;
+import ca.bcit.comp2522.games.game.word.score.PostSessionWordGameSummarizer;
+import ca.bcit.comp2522.games.game.word.score.SecondAttemptSuccessResult;
 import ca.bcit.comp2522.games.menu.TerminalMenu;
 import ca.bcit.comp2522.games.menu.item.MenuItem;
 import ca.bcit.comp2522.games.menu.item.NoMenuItem;
@@ -18,9 +22,14 @@ import ca.bcit.comp2522.games.menu.item.YesMenuItem;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 
@@ -33,19 +42,25 @@ import java.util.function.Function;
  */
 public final class WordGameController extends GameController {
 
+    /** The result achieved by guessing the question answer on the first attempt. */
+    public static final RoundResult FIRST_ATTEMPT_CORRECT_RESULT = new FirstAttemptSuccessResult();
+
+    /** The result achieved by guessing the question answer on the second attempt. */
+    public static final RoundResult SECOND_ATTEMPT_CORRECT_RESULT = new SecondAttemptSuccessResult();
+
+    /** The result achieved when not being able to guess the question by the last attempt. */
+    public static final RoundResult INCORRECT_RESULT = new FinalAttemptFailResult();
+
+    private static final Path PERSISTENT_SCORES_FILE = Path.of("score.txt");
     private static final String DATA_FILE_EXTENSION = "txt";
     private static final String[] DATA_FILE_NAMES = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
                                                       "n", "o", "p", "q", "r", "s", "t", "u", "v", "y", "z" };
 
     private static final World WORLD = WordGameController.loadWorld();
-    private static final int QUESTIONS_PER_GAME = 10;
-    private static final int ATTEMPTS_PER_QUESTION = 2;
-
-    private static final RoundResult FIRST_ATTEMPT_CORRECT_RESULT = new FirstAttemptSuccess();
-    private static final RoundResult SECOND_ATTEMPT_CORRECT_RESULT = new SecondAttemptSuccess();
-    private static final RoundResult INCORRECT_RESULT = new FinalAttemptFail();
 
     private static final List<Function<Country, CountryQuestion>> QUESTION_PROVIDERS = new ArrayList<>();
+    private static final int QUESTIONS_PER_GAME = 10;
+    private static final int ATTEMPTS_PER_QUESTION = 2;
 
     static {
         WordGameController.QUESTION_PROVIDERS.add(GuessCountryGivenCapitalQuestion::new);
@@ -170,7 +185,10 @@ public final class WordGameController extends GameController {
      * the result in a file.
      */
     private void playGame() {
+        final GameSessionScore scoreTracker;
         int totalRounds = 0;
+
+        scoreTracker = this.getCurrentScoreTracker();
 
         while (totalRounds < WordGameController.QUESTIONS_PER_GAME) {
             final Country country;
@@ -181,12 +199,16 @@ public final class WordGameController extends GameController {
             question = WordGameController.getQuestionOf(country);
             questionResult = this.askQuestion(totalRounds, question);
 
-            this.scoreTracker.reportRound(questionResult);
+            scoreTracker.reportRound(questionResult);
             totalRounds++;
         }
 
-        // TODO print current state of class wide score tracker
-        System.out.println("TEMP: played " + totalRounds + " rounds");
+        this.getCurrentScoreTracker().reportGameFinished();
+
+        final String summary;
+        summary = scoreTracker.summarize(new PostGameWordGameSummarizer());
+
+        System.out.println(System.lineSeparator() + summary);
     }
 
     /**
@@ -231,10 +253,69 @@ public final class WordGameController extends GameController {
 
     @Override
     protected void onFinish() {
-        // TODO print total amount of games played
-        // TODO save high score
-        // TODO report high score status
-        // TODO save global score tracker to file
+        final DecimalFormat pointsPerGameFormat;
+        pointsPerGameFormat = new DecimalFormat("#.##");
+
+        final GameSessionScore scoreTracker;
+        final Optional<GameSessionScore> highScoreTracker;
+        final double pointsPerGame;
+        final double highScorePointsPerGame;
+        final String pointsPerGameStr;
+        final String highScorePointsPerGameStr;
+        final String summary;
+
+        scoreTracker = this.getCurrentScoreTracker();
+        highScoreTracker = this.getHighScore();
+        pointsPerGame = scoreTracker.getPointsPerGame();
+        highScorePointsPerGame = highScoreTracker.map(GameSessionScore::getPointsPerGame).orElse(0.0);
+        pointsPerGameStr = pointsPerGameFormat.format(pointsPerGame);
+        highScorePointsPerGameStr = pointsPerGameFormat.format(highScorePointsPerGame);
+        summary = scoreTracker.summarize(new PostSessionWordGameSummarizer());
+
+        System.out.println(System.lineSeparator() + summary);
+        this.writeCurrentScore();
+
+        if (highScoreTracker.isEmpty()) {
+            System.out.println(
+                    "You have set a new high score with an average of " + pointsPerGameStr + " points per game!");
+            return;
+        }
+
+        final LocalDateTime highScoreDateTime;
+        final String highScoreDateStr;
+        final String highScoreTimeStr;
+
+        highScoreDateTime = highScoreTracker.get().getStartDateTime();
+        highScoreDateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(highScoreDateTime);
+        highScoreTimeStr = DateTimeFormatter.ofPattern("hh:mm:ss").format(highScoreDateTime);
+
+        if (pointsPerGame > highScorePointsPerGame) {
+            System.out.println("You have a set new high score with an average of " + pointsPerGameStr +
+                                       " points per game; the previous record was " + highScorePointsPerGameStr +
+                                       " points per game on " + highScoreDateStr + " at " + highScoreTimeStr + ".");
+        } else {
+            System.out.println(
+                    "You did not beat the high score of " + highScorePointsPerGameStr + " points per game from " +
+                            highScoreDateStr + " at  " + highScoreTimeStr + ".");
+        }
+    }
+
+    /**
+     * Writes the current score tracker to the persistent scores file.
+     */
+    private void writeCurrentScore() {
+        final GameSessionScore scoreTracker;
+        final String persistentSummary;
+
+        scoreTracker = this.getCurrentScoreTracker();
+        persistentSummary = scoreTracker.summarize(new PersistentWordGameSummarizer());
+
+        try {
+            Files.writeString(WordGameController.PERSISTENT_SCORES_FILE, persistentSummary + System.lineSeparator(),
+                              StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
