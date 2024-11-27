@@ -2,18 +2,12 @@ package ca.bcit.comp2522.games.game.word;
 
 import ca.bcit.comp2522.games.Main;
 import ca.bcit.comp2522.games.game.GameController;
-import ca.bcit.comp2522.games.game.score.GameSessionScore;
-import ca.bcit.comp2522.games.game.score.RoundResult;
 import ca.bcit.comp2522.games.game.word.question.CountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCapitalGivenCountryQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenCapitalQuestion;
 import ca.bcit.comp2522.games.game.word.question.GuessCountryGivenFactQuestion;
-import ca.bcit.comp2522.games.game.word.score.FinalAttemptFailResult;
-import ca.bcit.comp2522.games.game.word.score.FirstAttemptSuccessResult;
-import ca.bcit.comp2522.games.game.word.score.PersistentWordGameSummarizer;
-import ca.bcit.comp2522.games.game.word.score.PostGameWordGameSummarizer;
-import ca.bcit.comp2522.games.game.word.score.PostSessionWordGameSummarizer;
-import ca.bcit.comp2522.games.game.word.score.SecondAttemptSuccessResult;
+import ca.bcit.comp2522.games.game.word.score.Score;
+import ca.bcit.comp2522.games.game.word.score.ScoreManager;
 import ca.bcit.comp2522.games.menu.TerminalMenu;
 import ca.bcit.comp2522.games.menu.item.MenuItem;
 import ca.bcit.comp2522.games.menu.item.NoMenuItem;
@@ -22,10 +16,7 @@ import ca.bcit.comp2522.games.menu.item.YesMenuItem;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,25 +33,18 @@ import java.util.function.Function;
  */
 public final class WordGameController extends GameController {
 
-    /** The result achieved by guessing the question answer on the first attempt. */
-    public static final RoundResult FIRST_ATTEMPT_CORRECT_RESULT = new FirstAttemptSuccessResult();
-
-    /** The result achieved by guessing the question answer on the second attempt. */
-    public static final RoundResult SECOND_ATTEMPT_CORRECT_RESULT = new SecondAttemptSuccessResult();
-
-    /** The result achieved when not being able to guess the question by the last attempt. */
-    public static final RoundResult INCORRECT_RESULT = new FinalAttemptFailResult();
-
-    private static final Path PERSISTENT_SCORES_FILE = Path.of("score.txt");
-    private static final String DATA_FILE_EXTENSION = "txt";
-    private static final String[] DATA_FILE_NAMES = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
-                                                      "n", "o", "p", "q", "r", "s", "t", "u", "v", "y", "z" };
+    private static final String COUNTRY_DATA_FILE_EXT = "txt";
+    private static final String[] COUNTRY_DATA_FILE_NAMES = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
+                                                              "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
+                                                              "y", "z" };
 
     private static final World WORLD = WordGameController.loadWorld();
 
     private static final List<Function<Country, CountryQuestion>> QUESTION_PROVIDERS = new ArrayList<>();
     private static final int QUESTIONS_PER_GAME = 10;
     private static final int ATTEMPTS_PER_QUESTION = 2;
+
+    private static final ScoreManager SCORER = new ScoreManager(Path.of("score.txt"));
 
     static {
         WordGameController.QUESTION_PROVIDERS.add(GuessCountryGivenCapitalQuestion::new);
@@ -72,7 +56,7 @@ public final class WordGameController extends GameController {
      * Creates a new word game controller.
      */
     public WordGameController() {
-        super("Country Guesser", "Guess countries based off of facts and their capital city!");
+        super("Geo Guesser", "Test your geographical knowledge!");
     }
 
     /**
@@ -84,11 +68,11 @@ public final class WordGameController extends GameController {
         final List<Country> countries;
         countries = new ArrayList<>();
 
-        for (final String fileName : WordGameController.DATA_FILE_NAMES) {
+        for (final String fileName : WordGameController.COUNTRY_DATA_FILE_NAMES) {
             final String fileNameWithExtension;
             final Path filePath;
 
-            fileNameWithExtension = String.format("%s.%s", fileName, WordGameController.DATA_FILE_EXTENSION);
+            fileNameWithExtension = String.format("%s.%s", fileName, WordGameController.COUNTRY_DATA_FILE_EXT);
             filePath = Path.of("src", "resources", fileNameWithExtension);
 
             try {
@@ -165,60 +149,76 @@ public final class WordGameController extends GameController {
 
     @Override
     protected void onStart() {
+        final MenuItem yes;
+        final MenuItem no;
         final TerminalMenu<MenuItem> menu;
-        menu = new TerminalMenu<>("Do you want to play again?",
-                                  Map.of("Yes", new YesMenuItem(), "No", new NoMenuItem()));
+
+        yes = new YesMenuItem();
+        no = new NoMenuItem();
+        menu = new TerminalMenu<>("Do you want to play again?", Map.of("Yes", yes, "No", no));
 
         boolean cont = true;
         while (cont) {
+            final Score gameScore;
             final MenuItem choice;
 
-            this.playGame();
+            gameScore = this.playGame();
+
+            WordGameController.SCORER.addToSession(gameScore);
+            System.out.println();
+            System.out.println(WordGameController.SCORER.getSessionScore().toInterimReport());
 
             choice = menu.promptChoice();
-            cont = choice instanceof YesMenuItem;
+            cont = choice == yes;
         }
     }
 
     /**
-     * Plays a game that prompts the user for {@value WordGameController#QUESTIONS_PER_GAME} questions, and record
-     * the result in a file.
+     * Plays a game that prompts the user for {@value WordGameController#QUESTIONS_PER_GAME} questions, and records
+     * the result in the scores list.
+     *
+     * @return a single game score representing the game that was played
      */
-    private void playGame() {
-        final GameSessionScore scoreTracker;
+    private Score playGame() {
         int totalRounds = 0;
-
-        scoreTracker = this.getCurrentScoreTracker();
+        int firstAttemptAnswers = 0;
+        int secondAttemptAnswers = 0;
+        int fails = 0;
 
         while (totalRounds < WordGameController.QUESTIONS_PER_GAME) {
             final Country country;
             final CountryQuestion question;
-            final RoundResult questionResult;
+            final int attemptsToAnswer;
 
             country = WordGameController.WORLD.getRandomCountry();
             question = WordGameController.getQuestionOf(country);
-            questionResult = this.askQuestion(totalRounds, question);
+            attemptsToAnswer = this.askQuestion(totalRounds, question);
 
-            scoreTracker.reportRound(questionResult);
+            if (attemptsToAnswer == -1) {
+                fails++;
+            } else if (attemptsToAnswer == 1) {
+                firstAttemptAnswers++;
+            } else {
+                secondAttemptAnswers++;
+            }
+
             totalRounds++;
         }
 
-        this.getCurrentScoreTracker().reportGameFinished();
+        final Score gameScore;
+        gameScore = new Score(LocalDateTime.now(), 1, firstAttemptAnswers, secondAttemptAnswers, fails);
 
-        final String summary;
-        summary = scoreTracker.summarize(new PostGameWordGameSummarizer());
-
-        System.out.println(System.lineSeparator() + summary);
+        return gameScore;
     }
 
     /**
-     * Prompts the user for the specified question, and returns whether they entered a correct answer or not.
+     * Prompts the user for the specified question, and returns the result of the question.
      *
      * @param questionIndex the index of the question, used for the prompt
      * @param question      the question to ask
-     * @return the validity of the answer given by the user
+     * @return the amount of attempts the user needed to answer the question, or -1 if no answer was given
      */
-    private RoundResult askQuestion(final int questionIndex, final CountryQuestion question) {
+    private int askQuestion(final int questionIndex, final CountryQuestion question) {
         int attempts = 0;
 
         System.out.println(System.lineSeparator() + "Question " + (questionIndex + 1) + ". " + question.getQuestion());
@@ -236,11 +236,7 @@ public final class WordGameController extends GameController {
             if (answerCorrect) {
                 System.out.println("Correct answer, great job!");
 
-                if (attempts >= WordGameController.ATTEMPTS_PER_QUESTION) {
-                    return WordGameController.SECOND_ATTEMPT_CORRECT_RESULT;
-                } else {
-                    return WordGameController.FIRST_ATTEMPT_CORRECT_RESULT;
-                }
+                return attempts;
             } else if (attempts == WordGameController.ATTEMPTS_PER_QUESTION) {
                 System.out.println("Incorrect, the answer was \"" + question.getAnswer() + "\"!");
             } else {
@@ -248,74 +244,45 @@ public final class WordGameController extends GameController {
             }
         }
 
-        return WordGameController.INCORRECT_RESULT;
+        return -1;
     }
 
     @Override
     protected void onFinish() {
-        final DecimalFormat pointsPerGameFormat;
-        pointsPerGameFormat = new DecimalFormat("#.##");
+        final Score sessionScore;
+        final Optional<Score> highScore;
+        final double sessionScorePerGame;
+        final double highScorePerGame;
+        final LocalDateTime highScoreDateTime;
 
-        final GameSessionScore scoreTracker;
-        final Optional<GameSessionScore> highScoreTracker;
-        final double pointsPerGame;
-        final double highScorePointsPerGame;
-        final String pointsPerGameStr;
-        final String highScorePointsPerGameStr;
-        final String summary;
-
-        scoreTracker = this.getCurrentScoreTracker();
-        highScoreTracker = this.getHighScore();
-        pointsPerGame = scoreTracker.getPointsPerGame();
-        highScorePointsPerGame = highScoreTracker.map(GameSessionScore::getPointsPerGame).orElse(0.0);
-        pointsPerGameStr = pointsPerGameFormat.format(pointsPerGame);
-        highScorePointsPerGameStr = pointsPerGameFormat.format(highScorePointsPerGame);
-        summary = scoreTracker.summarize(new PostSessionWordGameSummarizer());
-
-        System.out.println(System.lineSeparator() + summary);
-        this.writeCurrentScore();
-
-        if (highScoreTracker.isEmpty()) {
-            System.out.println(
-                    "You have set a new high score with an average of " + pointsPerGameStr + " points per game!");
+        sessionScore = WordGameController.SCORER.getSessionScore();
+        if (sessionScore == null) {
             return;
         }
 
-        final LocalDateTime highScoreDateTime;
-        final String highScoreDateStr;
-        final String highScoreTimeStr;
+        highScore = WordGameController.SCORER.getHighScore();
+        sessionScorePerGame = sessionScore.getScorePerGame();
+        highScorePerGame = highScore.map(Score::getScorePerGame).orElse(0.0);
+        highScoreDateTime = highScore.map(Score::getDateTimePlayed).orElse(LocalDateTime.now());
 
-        highScoreDateTime = highScoreTracker.get().getStartDateTime();
-        highScoreDateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(highScoreDateTime);
-        highScoreTimeStr = DateTimeFormatter.ofPattern("hh:mm:ss").format(highScoreDateTime);
+        System.out.println();
+        System.out.println(sessionScore.toFinalizedReport());
 
-        if (pointsPerGame > highScorePointsPerGame) {
-            System.out.println("You have a set new high score with an average of " + pointsPerGameStr +
-                                       " points per game; the previous record was " + highScorePointsPerGameStr +
-                                       " points per game on " + highScoreDateStr + " at " + highScoreTimeStr + ".");
+        if (highScore.isEmpty()) {
+            System.out.printf("CONGRATULATIONS! You set the high score with an average of %s points per game!\n",
+                              Score.formatScorePerGame(sessionScorePerGame));
+        } else if (sessionScorePerGame > highScorePerGame) {
+            System.out.printf(
+                    "CONGRATULATIONS! You set the new high score with an average of %s points per game; the previous " +
+                            "record was %s points per game on %s.\n", Score.formatScorePerGame(sessionScorePerGame),
+                    Score.formatScorePerGame(highScorePerGame), Score.formatDateTimePlayed(highScoreDateTime));
         } else {
-            System.out.println(
-                    "You did not beat the high score of " + highScorePointsPerGameStr + " points per game from " +
-                            highScoreDateStr + " at  " + highScoreTimeStr + ".");
+            System.out.printf("You did not beat the high score of %s points per game from %s.%n",
+                              Score.formatScorePerGame(highScorePerGame),
+                              Score.formatDateTimePlayed(highScoreDateTime));
         }
-    }
 
-    /**
-     * Writes the current score tracker to the persistent scores file.
-     */
-    private void writeCurrentScore() {
-        final GameSessionScore scoreTracker;
-        final String persistentSummary;
-
-        scoreTracker = this.getCurrentScoreTracker();
-        persistentSummary = scoreTracker.summarize(new PersistentWordGameSummarizer());
-
-        try {
-            Files.writeString(WordGameController.PERSISTENT_SCORES_FILE, persistentSummary + System.lineSeparator(),
-                              StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        WordGameController.SCORER.commitSession();
     }
 
 }

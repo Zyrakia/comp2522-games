@@ -1,10 +1,6 @@
 package ca.bcit.comp2522.games.game;
 
-import ca.bcit.comp2522.games.game.score.GameSessionScore;
-import ca.bcit.comp2522.games.game.score.ScoreManager;
 import ca.bcit.comp2522.games.menu.item.MenuItem;
-
-import java.util.Optional;
 
 /**
  * Represents a game that can be played within this application.
@@ -14,7 +10,6 @@ import java.util.Optional;
  */
 public abstract class GameController implements MenuItem {
 
-    private final ScoreManager scoreManager;
     private final String name;
     private final String description;
 
@@ -30,7 +25,6 @@ public abstract class GameController implements MenuItem {
 
         this.name = name;
         this.description = description;
-        this.scoreManager = new ScoreManager();
     }
 
     /**
@@ -51,12 +45,8 @@ public abstract class GameController implements MenuItem {
      * has finished.
      */
     public final synchronized void launch() {
-        this.scoreManager.startNewSession();
-
         this.onStart();
         this.onFinish();
-
-        this.scoreManager.commitCurrentSession();
     }
 
     /**
@@ -87,24 +77,6 @@ public abstract class GameController implements MenuItem {
     @Override
     public final String getDescription() {
         return this.description;
-    }
-
-    /**
-     * Returns the current score tracker for the running game.
-     *
-     * @return the score tracker for the running game
-     */
-    protected final GameSessionScore getCurrentScoreTracker() {
-        return this.scoreManager.getCurrentSession();
-    }
-
-    /**
-     * Returns the score tracker for the game session that achieved the highest points per game so far.
-     *
-     * @return the score tracker for the highest scoring session
-     */
-    protected final Optional<GameSessionScore> getHighScore() {
-        return this.scoreManager.getHighScore();
     }
 
 }

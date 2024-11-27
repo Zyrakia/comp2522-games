@@ -26,7 +26,7 @@ public final class TerminalMenu<T extends MenuItem> {
      * Creates a new menu with the specified items as options.
      *
      * @param title the title of the menu
-     * @param items the items that can be played
+     * @param items the items that can be selected
      */
     public TerminalMenu(final String title, final Map<String, T> items) {
         TerminalMenu.validateTitle(title);
