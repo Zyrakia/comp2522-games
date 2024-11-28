@@ -26,6 +26,7 @@ public final class NumberGameController extends GuiGameController {
     private static final int RANDOM_MAX = 20;
 
     private final Random rand;
+    private final NumberGameStats stats;
     private final Set<Integer> placedNumbers;
     private final NumberGameGrid grid;
     private final Label statusLabel;
@@ -43,6 +44,7 @@ public final class NumberGameController extends GuiGameController {
         renderedGrid = new RenderedIntegerGrid(this::createGridButton);
 
         this.rand = new Random();
+        this.stats = new NumberGameStats();
         this.placedNumbers = new HashSet<>();
         this.grid = new NumberGameGrid();
         this.statusLabel = this.createStatusLabel();
@@ -77,6 +79,12 @@ public final class NumberGameController extends GuiGameController {
      */
     public void setNextTarget() {
         this.targetNumber = this.generateNextTarget();
+
+        if (!this.grid.canPlaceAscending(this.targetNumber)) {
+            this.handleLoss("The next number (" + this.targetNumber + ") cannot be placed.");
+        } else {
+            this.statusLabel.setText("Place " + this.targetNumber + " into an empty slot");
+        }
     }
 
     /**
@@ -93,13 +101,11 @@ public final class NumberGameController extends GuiGameController {
             return;
         }
 
-        this.setNextTarget();
-
-        if (!this.grid.canPlaceAscending(this.targetNumber)) {
-            this.handleLoss("The next number (" + this.targetNumber + ") cannot be placed.");
-        } else {
-            this.statusLabel.setText("Place " + this.targetNumber + " into an empty slot");
+        if (this.targetNumber != null) {
+            this.stats.recordPlacement();
         }
+
+        this.setNextTarget();
     }
 
     /**
@@ -111,6 +117,7 @@ public final class NumberGameController extends GuiGameController {
         this.statusLabel.setText("🪦 You have lost. 🪦");
         this.targetNumber = null;
 
+        this.stats.recordLoss();
         this.showRestartAlert(Alert.AlertType.ERROR, "You lost!", reason);
     }
 
@@ -121,6 +128,7 @@ public final class NumberGameController extends GuiGameController {
         this.statusLabel.setText("🎊 Congratulations!! 🎊");
         this.targetNumber = null;
 
+        this.stats.recordWin();
         this.showRestartAlert(Alert.AlertType.INFORMATION, "You have won!",
                               "This was pretty much impossible, so I am not sure how you did it, but congratulations!");
     }
@@ -144,8 +152,10 @@ public final class NumberGameController extends GuiGameController {
         final Optional<ButtonType> res;
         res = alert.showAndWait();
 
+        System.out.println(this.stats);
+
         if (res.isPresent() && res.get() == restartButton) {
-            this.reset();
+            this.resetGameState();
         } else {
             this.getStage().close();
         }
@@ -174,7 +184,7 @@ public final class NumberGameController extends GuiGameController {
         welcomeAlert.showAndWait();
 
         this.renderedGrid.renderFrom(this.grid);
-        this.handleGridUpdate();
+        this.setNextTarget();
     }
 
     @Override
@@ -191,13 +201,14 @@ public final class NumberGameController extends GuiGameController {
 
     @Override
     protected void onFinish() {
-        this.reset();
+        this.resetGameState();
+        this.stats.reset();
     }
 
     /**
      * Resets the grid and placed numbers.
      */
-    private void reset() {
+    private void resetGameState() {
         this.targetNumber = null;
         this.placedNumbers.clear();
         this.grid.clear();
