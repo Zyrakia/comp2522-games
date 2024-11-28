@@ -28,48 +28,37 @@ public class NumberGameGrid extends IntegerGrid {
      * @return whether the value can be placed
      */
     public boolean canPlaceAscending(final int valueToPlace) {
-        final Iterator<Point> griderator;
-        griderator = this.griderator();
+        final Iterator<Point> iter;
+        iter = this.griderator();
 
-        while (griderator.hasNext()) {
+        while (iter.hasNext()) {
             final Point currentPoint;
             final Integer currentValue;
 
-            currentPoint = griderator.next();
+            currentPoint = iter.next();
             currentValue = this.get(currentPoint);
 
-            System.out.println("Scanning point " + currentPoint + " (" + currentValue + ")");
-
-            // If we have an empty cell, we need to see if we can place it there
-            if (currentValue == null) {
-                final Iterator<Point> lookaheadGriderator;
-                lookaheadGriderator = this.griderator(currentPoint);
-
-                // We need to skip past the current point
-                lookaheadGriderator.next();
-
-                while (lookaheadGriderator.hasNext()) {
-                    final Point lookaheadPoint;
-                    final Integer nextValue;
-
-                    lookaheadPoint = lookaheadGriderator.next();
-                    nextValue = this.get(lookaheadPoint);
-
-                    if (nextValue != null && nextValue < valueToPlace) {
-                        // There is a next value that is smaller, we cannot place
-                        return false;
-                    }
+            if (currentValue != null) {
+                // We found a bigger value already, we can short circuit
+                // This is only possible because we are assuming it is already ascending
+                if (currentValue > valueToPlace) {
+                    return false;
                 }
 
-                // All the cells after the empty cells are higher or equal, we can place it
+                // Move on to find the next empty spot
+                continue;
+            }
+
+            // We have an empty spot, so if there is a valid right neighbour, we can place here
+
+            final Point nextFilled;
+            nextFilled = this.getNextFilled(currentPoint);
+
+            if (nextFilled == null || this.get(nextFilled) > valueToPlace) {
                 return true;
-            } else if (currentValue > valueToPlace) {
-                // We now know that we are already past the point at which we can place
-                return false;
             }
         }
 
-        // There were no empty cells at all, so we cannot place anything
         return false;
     }
 
