@@ -1,12 +1,14 @@
 package ca.bcit.comp2522.games.game.number;
 
+import java.util.Objects;
+
 /**
  * Represents a point in a 2D plane.
  *
  * @author Ole Lammers
  * @version 1.0
  */
-public class Point {
+public final class Point {
 
     private final int x;
     private final int y;
@@ -101,6 +103,17 @@ public class Point {
     @Override
     public String toString() {
         return String.format("(x: %d, y: %d)", this.x(), this.y());
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof final Point point)) return false;
+        return this.x == point.x && this.y == point.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.x, this.y);
     }
 
 }
