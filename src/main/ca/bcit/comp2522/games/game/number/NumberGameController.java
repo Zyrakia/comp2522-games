@@ -1,6 +1,7 @@
 package ca.bcit.comp2522.games.game.number;
 
 import ca.bcit.comp2522.games.game.GuiGameController;
+import ca.bcit.comp2522.games.util.Point;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;

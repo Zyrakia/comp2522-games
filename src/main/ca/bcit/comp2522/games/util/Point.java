@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.games.game.number;
+package ca.bcit.comp2522.games.util;
 
 import java.util.Objects;
 

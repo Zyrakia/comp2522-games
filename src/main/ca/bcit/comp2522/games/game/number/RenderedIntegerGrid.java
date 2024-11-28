@@ -1,6 +1,7 @@
 package ca.bcit.comp2522.games.game.number;
 
 import ca.bcit.comp2522.games.util.Observer;
+import ca.bcit.comp2522.games.util.Point;
 import javafx.scene.Node;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;

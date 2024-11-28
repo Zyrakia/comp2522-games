@@ -1,6 +1,7 @@
 package ca.bcit.comp2522.games.game.number;
 
 import ca.bcit.comp2522.games.util.Observable;
+import ca.bcit.comp2522.games.util.Point;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
