@@ -47,10 +47,20 @@ public abstract class GuiGameController extends GameController {
     protected abstract Parent getStartingRoot();
 
     /**
-     * Hides the stage associated with this game, indicating that the game has finished.
+     * Hides the stage associated with this game, indicating that the game has finished. This is a shortcut for
+     * manually hiding the stage.
      */
     protected final void finish() {
         this.stage.hide();
+    }
+
+    /**
+     * Returns the stage that this game is being played on. Hiding or closing this stage in any way terminates the game.
+     *
+     * @return the stage
+     */
+    protected final Stage getStage() {
+        return this.stage;
     }
 
     /**

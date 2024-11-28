@@ -1,6 +1,7 @@
 package ca.bcit.comp2522.games;
 
 import ca.bcit.comp2522.games.game.GameController;
+import ca.bcit.comp2522.games.game.number.NumberGameController;
 import ca.bcit.comp2522.games.game.quit.QuitGameController;
 import ca.bcit.comp2522.games.game.word.WordGameController;
 import ca.bcit.comp2522.games.menu.TerminalMenu;
@@ -67,6 +68,8 @@ public final class Main extends Application {
         games = new LinkedHashMap<>();
 
         games.put("W", new WordGameController());
+        games.put("N", new NumberGameController());
+        //        games.put("M", new CraftingSimulatorController());
         games.put("Q", new QuitGameController());
 
         return games;
