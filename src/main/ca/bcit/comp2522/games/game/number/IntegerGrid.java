@@ -1,5 +1,7 @@
 package ca.bcit.comp2522.games.game.number;
 
+import ca.bcit.comp2522.games.util.Observable;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -9,7 +11,7 @@ import java.util.NoSuchElementException;
  * @author Ole Lammers
  * @version 1.0
  */
-public class IntegerGrid {
+public class IntegerGrid extends Observable<IntegerGrid> {
 
     private final int rows;
     private final int cols;
@@ -58,6 +60,10 @@ public class IntegerGrid {
      * @param point the coordinate point
      */
     private void assertPoint(final Point point) {
+        if (point == null) {
+            throw new IllegalArgumentException("Point must not be null!");
+        }
+
         if (!this.isWithinRange(point)) {
             throw new IllegalArgumentException("Out of bounds grid point: " + point);
         }
@@ -119,6 +125,27 @@ public class IntegerGrid {
     }
 
     /**
+     * Returns whether this grid has an empty point.
+     *
+     * @return whether this grid has at least one empty point
+     */
+    public boolean hasEmpty() {
+        final Iterator<Point> griderator;
+        griderator = this.griderator();
+
+        while (griderator.hasNext()) {
+            final Point point;
+            point = griderator.next();
+
+            if (this.isEmpty(point)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns a new iterator that moves over all the points on the grid from left to right and top to bottom. If the
      * last point has been retrieved, there will be no more points in the iterator.
      *
@@ -170,6 +197,31 @@ public class IntegerGrid {
     }
 
     /**
+     * Returns the nearest point after a given point that has a value.
+     *
+     * @param point the point to search after
+     * @return the point of the next empty neighbour, or null if there is no such neighbour
+     */
+    public Point getNextFilled(final Point point) {
+        this.assertPoint(point);
+
+        final Iterator<Point> griderator;
+        griderator = this.griderator(point);
+        griderator.next();
+
+        while (griderator.hasNext()) {
+            final Point nextPoint;
+            nextPoint = griderator.next();
+
+            if (!this.isEmpty(nextPoint)) {
+                return nextPoint;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Places the given value at the given point.
      *
      * @param point the point to place at
@@ -178,6 +230,22 @@ public class IntegerGrid {
     public void place(final Point point, final int value) {
         this.assertPoint(point);
         this.grid[point.y()][point.x()] = value;
+        this.announceUpdate(this);
+    }
+
+    /**
+     * Resets all points on the grid.
+     */
+    public void clear() {
+        final Iterator<Point> griderator;
+        griderator = this.griderator();
+
+        while (griderator.hasNext()) {
+            final Point point = griderator.next();
+            this.grid[point.y()][point.x()] = null;
+        }
+
+        this.announceUpdate(this);
     }
 
     /**
