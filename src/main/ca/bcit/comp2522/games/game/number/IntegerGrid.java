@@ -75,7 +75,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      * @param point the point to check
      * @return whether the point is in range
      */
-    public boolean isWithinRange(final Point point) {
+    public final boolean isWithinRange(final Point point) {
         return point.x() >= 0 && point.x() < this.cols && point.y() >= 0 && point.y() < this.rows;
     }
 
@@ -85,7 +85,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      * @param point the point to check
      * @return whether the point is empty
      */
-    public boolean isEmpty(final Point point) {
+    public final boolean isEmpty(final Point point) {
         return this.get(point) == null;
     }
 
@@ -97,7 +97,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      * @param point the point
      * @return the value at the point
      */
-    public Integer get(final Point point) {
+    public final Integer get(final Point point) {
         this.assertPoint(point);
         return this.grid[point.y()][point.x()];
     }
@@ -108,7 +108,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      * @param value the value to find
      * @return the point, or `null` if no point holds the value
      */
-    public Point find(final int value) {
+    public final Point find(final int value) {
         final Iterator<Point> griderator;
         griderator = this.griderator();
 
@@ -129,7 +129,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      *
      * @return whether this grid has at least one empty point
      */
-    public boolean hasEmpty() {
+    public final boolean hasEmpty() {
         final Iterator<Point> griderator;
         griderator = this.griderator();
 
@@ -152,7 +152,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      * @param startingPoint the point to start at within the grid
      * @return the point iterator
      */
-    public Iterator<Point> griderator(final Point startingPoint) {
+    public final Iterator<Point> griderator(final Point startingPoint) {
         this.assertPoint(startingPoint);
 
         return new Iterator<>() {
@@ -192,7 +192,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      *
      * @return the point iterator
      */
-    public Iterator<Point> griderator() {
+    public final Iterator<Point> griderator() {
         return this.griderator(Point.zero());
     }
 
@@ -202,7 +202,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      * @param point the point to search after
      * @return the point of the next empty neighbour, or null if there is no such neighbour
      */
-    public Point getNextFilled(final Point point) {
+    public final Point getNextFilled(final Point point) {
         this.assertPoint(point);
 
         final Iterator<Point> griderator;
@@ -227,7 +227,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      * @param point the point to place at
      * @param value the value to place
      */
-    public void place(final Point point, final int value) {
+    public final void place(final Point point, final int value) {
         this.assertPoint(point);
         this.grid[point.y()][point.x()] = value;
         this.announceUpdate(this);
@@ -236,7 +236,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
     /**
      * Resets all points on the grid.
      */
-    public void clear() {
+    public final void clear() {
         final Iterator<Point> griderator;
         griderator = this.griderator();
 
@@ -253,7 +253,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      *
      * @return the rows
      */
-    public int getRows() {
+    public final int getRows() {
         return this.rows;
     }
 
@@ -262,7 +262,7 @@ public class IntegerGrid extends Observable<IntegerGrid> {
      *
      * @return the cols
      */
-    public int getCols() {
+    public final int getCols() {
         return this.cols;
     }
 

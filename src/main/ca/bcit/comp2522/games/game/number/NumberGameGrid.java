@@ -8,7 +8,7 @@ import java.util.Iterator;
  * @author Ole Lammers
  * @version 1.0
  */
-public class NumberGameGrid extends IntegerGrid {
+public final class NumberGameGrid extends IntegerGrid {
 
     public static final int ROWS = 4;
     public static final int COLUMNS = 5;

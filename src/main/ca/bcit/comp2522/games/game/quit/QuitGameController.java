@@ -8,7 +8,7 @@ import ca.bcit.comp2522.games.game.GameController;
  * @author Ole Lammers
  * @version 1.0
  */
-public class QuitGameController extends GameController {
+public final class QuitGameController extends GameController {
 
     /**
      * Creates a new quitting controller.

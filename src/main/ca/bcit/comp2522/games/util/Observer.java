@@ -7,6 +7,7 @@ package ca.bcit.comp2522.games.util;
  * @author Ole Lammers
  * @version 1.0
  */
+@FunctionalInterface
 public interface Observer<T> {
 
     /**

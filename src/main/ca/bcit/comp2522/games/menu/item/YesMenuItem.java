@@ -6,7 +6,7 @@ package ca.bcit.comp2522.games.menu.item;
  * @author Ole Lammers
  * @version 1.0
  */
-public class YesMenuItem implements MenuItem {
+public final class YesMenuItem implements MenuItem {
 
     @Override
     public String getName() {
