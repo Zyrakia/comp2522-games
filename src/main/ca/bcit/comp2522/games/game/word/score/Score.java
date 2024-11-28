@@ -127,6 +127,10 @@ public final class Score {
         final List<Score> scores;
 
         try {
+            if (Files.notExists(file)) {
+                Files.createFile(file);
+            }
+
             lines = Files.readAllLines(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
