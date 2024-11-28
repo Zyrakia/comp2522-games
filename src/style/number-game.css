@@ -1,0 +1,49 @@
+.root {
+    -fx-font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI";
+
+    -clr-bg: #261C15;
+    -clr-bgmid: #4e6e58;
+    -clr-accent: #f49fbc;
+    -clr-accent2: #6cd4ff;
+    -clr-white: #edf7d2;
+}
+
+.vbox {
+    -fx-padding: 15;
+    -fx-spacing: 15;
+    -fx-alignment: center;
+    -fx-background-color: -clr-bg;
+}
+
+.grid {
+    -fx-padding: 10;
+    -fx-hgap: 15;
+    -fx-vgap: 15;
+}
+
+.button {
+    -fx-font-size: 24;
+    -fx-border-width: 3;
+
+    -fx-text-fill: -clr-white;
+    -fx-border-color: -clr-white;
+    -fx-background-color: -clr-bgmid;
+
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+
+    -fx-cursor: hand;
+}
+
+.button:hover, .button:focused, .button:selected {
+    -fx-border-color: -clr-accent;
+}
+
+.button:disabled {
+    -fx-border-color: -clr-accent2;
+}
+
+.label {
+    -fx-text-fill: -clr-white;
+    -fx-font-size: 24;
+}

@@ -41,13 +41,13 @@ public abstract class GuiGameController extends GameController {
 
         this.stage.setTitle(this.getName());
         this.stage.setResizable(false);
-        this.stage.setAlwaysOnTop(true);
     }
 
     @Override
     protected final void onStart() {
         this.preRenderSetup();
         this.transitionTo(this.getInitialRoot());
+        this.stage.toFront();
         this.stage.showAndWait();
     }
 
