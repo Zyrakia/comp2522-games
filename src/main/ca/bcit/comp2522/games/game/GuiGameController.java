@@ -1,8 +1,14 @@
 package ca.bcit.comp2522.games.game;
 
+import ca.bcit.comp2522.games.util.FileWatcher;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a game that is run within a GUI window.
@@ -17,6 +23,9 @@ public abstract class GuiGameController extends GameController {
 
     private final Stage stage;
 
+    private final FileWatcher stylesheetWatcher;
+    private final Set<String> stylesheets;
+
     /**
      * Creates a new game that will be played within a GUI screen.
      *
@@ -25,34 +34,34 @@ public abstract class GuiGameController extends GameController {
      */
     public GuiGameController(final String name, final String description) {
         super(name, description);
+
         this.stage = new Stage();
+        this.stylesheetWatcher = new FileWatcher((v) -> this.injectStylesheet(v.toUri().toString()));
+        this.stylesheets = new HashSet<>();
+
+        this.stage.setTitle(this.getName());
+        this.stage.setResizable(false);
+        this.stage.setAlwaysOnTop(true);
     }
 
     @Override
     protected final void onStart() {
-        this.stage.setTitle(this.getName());
-        this.stage.setResizable(false);
-        this.stage.setAlwaysOnTop(true);
-
-        this.transitionTo(this.getStartingRoot());
-
+        this.preRenderSetup();
+        this.transitionTo(this.getInitialRoot());
         this.stage.showAndWait();
     }
 
     /**
-     * Returns the starting root for this game. This will be the Node that is displayed when the game is started.
-     *
-     * @return the starting root node
+     * Gets called when a game has started and the stage is about to be shown.
      */
-    protected abstract Parent getStartingRoot();
+    protected abstract void preRenderSetup();
 
     /**
-     * Hides the stage associated with this game, indicating that the game has finished. This is a shortcut for
-     * manually hiding the stage.
+     * Prepares the initial root that is rendered when a new game begins.
+     *
+     * @return the initial root
      */
-    protected final void finish() {
-        this.stage.hide();
-    }
+    protected abstract Parent getInitialRoot();
 
     /**
      * Returns the stage that this game is being played on. Hiding or closing this stage in any way terminates the game.
@@ -72,9 +81,89 @@ public abstract class GuiGameController extends GameController {
         final Scene scene;
         scene = new Scene(root, GuiGameController.WIDTH, GuiGameController.HEIGHT);
 
-        // TODO figure out stylesheets
+        scene.getStylesheets().addAll(this.stylesheets);
 
         this.stage.setScene(scene);
+    }
+
+    /**
+     * Adds the given stylesheet globally to this stage.
+     *
+     * @param stylesheet the stylesheet
+     */
+    protected void addStylesheet(final String stylesheet) {
+        final Path path;
+        final String uri;
+
+        path = Path.of(stylesheet);
+        uri = path.toUri().toString();
+
+        this.stylesheets.add(uri);
+        this.stylesheetWatcher.watch(path);
+        this.injectStylesheet(uri);
+    }
+
+    /**
+     * Removes the given stylesheet from this stage.
+     *
+     * @param stylesheet the stylesheet
+     */
+    protected void removeStylesheet(final String stylesheet) {
+        final Path path;
+        final String uri;
+
+        path = Path.of(stylesheet);
+        uri = path.toUri().toString();
+
+        this.stylesheets.remove(uri);
+        this.stylesheetWatcher.unwatch(path);
+        this.pullStylesheet(uri);
+    }
+
+    /**
+     * Hot reloads the given stylesheet on the current scene.
+     *
+     * @param stylesheet the stylesheet
+     */
+    private void injectStylesheet(final String stylesheet) {
+        final Scene currentScene;
+        currentScene = this.getStage().getScene();
+
+        if (currentScene == null) {
+            return;
+        }
+
+        final List<String> stylesheets = currentScene.getStylesheets();
+
+        if (!stylesheets.contains(stylesheet)) {
+            stylesheets.add(stylesheet);
+            return;
+        }
+
+        stylesheets.remove(stylesheet);
+
+        // Cache busting
+        stylesheets.add("data:,");
+
+        stylesheets.add(stylesheet);
+
+        stylesheets.remove("data:,");
+    }
+
+    /**
+     * Pulls the given stylesheet from the current scene.
+     *
+     * @param stylesheet the stylesheet
+     */
+    private void pullStylesheet(final String stylesheet) {
+        final Scene currentScene;
+        currentScene = this.getStage().getScene();
+
+        if (currentScene == null) {
+            return;
+        }
+
+        currentScene.getStylesheets().remove(stylesheet);
     }
 
 }
