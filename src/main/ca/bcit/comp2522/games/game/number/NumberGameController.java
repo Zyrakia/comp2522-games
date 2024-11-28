@@ -24,7 +24,7 @@ import java.util.Set;
 public final class NumberGameController extends GuiGameController {
 
     private static final int RANDOM_MIN = 1;
-    private static final int RANDOM_MAX = 20;
+    private static final int RANDOM_MAX = 1000;
 
     private final Random rand;
     private final NumberGameStats stats;
@@ -134,13 +134,21 @@ public final class NumberGameController extends GuiGameController {
                               "This was pretty much impossible, so I am not sure how you did it, but congratulations!");
     }
 
+    /**
+     * Shows an alert that has two custom buttons, one to restart the game and one to quit the game. Whichever
+     * selection is made is handled by this method.
+     *
+     * @param type        the type of alert to show
+     * @param title       the title of the alert
+     * @param description the content of the alert
+     */
     private void showRestartAlert(final Alert.AlertType type, final String title, final String description) {
         final Alert alert;
         final ButtonType restartButton;
         final ButtonType quitButton;
 
         alert = new Alert(type);
-        restartButton = new ButtonType("Try Again");
+        restartButton = new ButtonType("Play Again");
         quitButton = new ButtonType("Quit");
 
         alert.setTitle(title);
