@@ -33,6 +33,7 @@ import java.util.function.Function;
  */
 public final class WordGameController extends GameController {
 
+    private static final Path COUNTRY_DATA_DIR = Path.of("src", "resources", "countries");
     private static final String COUNTRY_DATA_FILE_EXT = "txt";
     private static final String[] COUNTRY_DATA_FILE_NAMES = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
                                                               "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
@@ -72,8 +73,8 @@ public final class WordGameController extends GameController {
             final String fileNameWithExtension;
             final Path filePath;
 
-            fileNameWithExtension = String.format("%s.%s", fileName, WordGameController.COUNTRY_DATA_FILE_EXT);
-            filePath = Path.of("src", "resources", fileNameWithExtension);
+            fileNameWithExtension = fileName.concat(".").concat(WordGameController.COUNTRY_DATA_FILE_EXT);
+            filePath = WordGameController.COUNTRY_DATA_DIR.resolve(fileNameWithExtension);
 
             try {
                 countries.addAll(WordGameController.loadCountriesFromFile(filePath));

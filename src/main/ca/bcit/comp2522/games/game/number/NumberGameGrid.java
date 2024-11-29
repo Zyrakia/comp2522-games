@@ -72,7 +72,8 @@ public final class NumberGameGrid extends IntegerGrid {
      * @return whether the current state of the grid is ascending
      */
     public boolean isAscending() {
-        Iterator<Point> griderator = this.griderator();
+        final Iterator<Point> griderator;
+        griderator = this.griderator();
 
         int last = Integer.MIN_VALUE;
         while (griderator.hasNext()) {

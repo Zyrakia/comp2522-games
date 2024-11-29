@@ -54,7 +54,7 @@ public final class NumberGameController extends GuiGameController {
         this.grid.observe(renderedGrid);
         this.grid.observe(_ -> this.handleGridUpdate());
 
-        this.addStylesheet("src/style/number-game.css");
+        this.addStylesheet("number-game.css");
     }
 
     /**

@@ -18,6 +18,8 @@ import java.util.Set;
  */
 public abstract class GuiGameController extends GameController {
 
+    private static final Path STYLES_DIR = Path.of("src", "resources", "styles");
+
     private static final int WIDTH = 600;
     private static final int HEIGHT = 400;
 
@@ -41,6 +43,16 @@ public abstract class GuiGameController extends GameController {
 
         this.stage.setTitle(this.getName());
         this.stage.setResizable(false);
+    }
+
+    /**
+     * Takes a stylesheet name and prefixes it with the stylesheet directory path.
+     *
+     * @param stylesheet the stylesheet name
+     * @return the path to the stylesheet
+     */
+    private static Path resolveStylesheetPath(final String stylesheet) {
+        return GuiGameController.STYLES_DIR.resolve(stylesheet);
     }
 
     @Override
@@ -89,13 +101,13 @@ public abstract class GuiGameController extends GameController {
     /**
      * Adds the given stylesheet globally to this stage.
      *
-     * @param stylesheet the stylesheet
+     * @param stylesheet the stylesheet file name
      */
     protected void addStylesheet(final String stylesheet) {
         final Path path;
         final String uri;
 
-        path = Path.of(stylesheet);
+        path = GuiGameController.resolveStylesheetPath(stylesheet);
         uri = path.toUri().toString();
 
         this.stylesheets.add(uri);
@@ -106,13 +118,13 @@ public abstract class GuiGameController extends GameController {
     /**
      * Removes the given stylesheet from this stage.
      *
-     * @param stylesheet the stylesheet
+     * @param stylesheet the stylesheet file name
      */
     protected void removeStylesheet(final String stylesheet) {
         final Path path;
         final String uri;
 
-        path = Path.of(stylesheet);
+        path = GuiGameController.resolveStylesheetPath(stylesheet);
         uri = path.toUri().toString();
 
         this.stylesheets.remove(uri);
