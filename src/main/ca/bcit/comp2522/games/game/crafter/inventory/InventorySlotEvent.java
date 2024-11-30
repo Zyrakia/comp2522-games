@@ -1,68 +1,108 @@
 package ca.bcit.comp2522.games.game.crafter.inventory;
 
+import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
+
 /**
- * Represents an update to an inventory slot.
+ * Represents an event to a slot within an inventory.
  *
  * @author Ole Lammers
  * @version 1.0
  */
 public final class InventorySlotEvent {
 
-    private final InventorySlot slot;
-    private final InventorySlotEvent.Type type;
+    private final Type type;
+    private final int slotIndex;
+    private final ItemStack stack;
 
     /**
-     * Creates a new event relating to the given slot, and of the given type.
+     * Creates a new slot event.
      *
-     * @param slot the updated slot
-     * @param type the type of update
+     * @param type      the type of event
+     * @param slotIndex the slot this event relates to
+     * @param stack     the item stack this event relates to
      */
-    public InventorySlotEvent(final InventorySlot slot, final InventorySlotEvent.Type type) {
-        this.slot = slot;
+    public InventorySlotEvent(final Type type, final int slotIndex, final ItemStack stack) {
+        InventorySlotEvent.validateType(type);
+        InventorySlotEvent.validateSlotIndex(slotIndex);
+        InventorySlotEvent.validateStack(stack);
+
         this.type = type;
+        this.slotIndex = slotIndex;
+        this.stack = stack;
     }
 
     /**
-     * Creates a new event indicating that the specified slot has changed.
+     * Creates a new slot event of type {@link Type#FILLED}.
      *
-     * @param slot the updated slot
-     * @return the event
+     * @param slotIndex the slot index that was filled
+     * @param stack     the stack that filled the slot
+     * @return the created event
      */
-    public static InventorySlotEvent changed(InventorySlot slot) {
-        return new InventorySlotEvent(slot, Type.CHANGED);
+    public static InventorySlotEvent filled(final int slotIndex, final ItemStack stack) {
+        return new InventorySlotEvent(Type.FILLED, slotIndex, stack);
     }
 
     /**
-     * Creates a new event indicating that the specified slot has been added.
+     * Creates a new slot event of type {@link Type#EMPTIED}.
      *
-     * @param slot the updated slot
-     * @return the event
+     * @param slotIndex the slot index that was emptied
+     * @param stack     the stack that was removed
+     * @return the created event
      */
-    public static InventorySlotEvent added(InventorySlot slot) {
-        return new InventorySlotEvent(slot, Type.ADDED);
+    public static InventorySlotEvent emptied(final int slotIndex, final ItemStack stack) {
+        return new InventorySlotEvent(Type.FILLED, slotIndex, stack);
     }
 
     /**
-     * Creates a new event indicating that the specified slot has been removed.
+     * Creates a new slot event of type {@link Type#CHANGED}.
      *
-     * @param slot the updated slot
-     * @return the event
+     * @param slotIndex the slot index that was changed
+     * @param stack     the updated stack
+     * @return the created event
      */
-    public static InventorySlotEvent removed(InventorySlot slot) {
-        return new InventorySlotEvent(slot, Type.REMOVED);
+    public static InventorySlotEvent changed(final int slotIndex, final ItemStack stack) {
+        return new InventorySlotEvent(Type.FILLED, slotIndex, stack);
     }
 
     /**
-     * Returns the slot this event relates to.
+     * Validates the slot event type to ensure it is valid.
      *
-     * @return the slot
+     * @param type the event type
      */
-    public InventorySlot getSlot() {
-        return this.slot;
+    private static void validateType(final Type type) {
+        if (type == null) {
+            throw new IllegalArgumentException("A slot event must have a type.");
+        }
     }
 
     /**
-     * Returns the type of this event.
+     * Validates the given slot index to ensure it is within limits for an event.
+     *
+     * @param slotIndex the slot index
+     */
+    private static void validateSlotIndex(final int slotIndex) {
+        final int minSlot;
+        minSlot = 0;
+
+        if (slotIndex < minSlot) {
+            throw new IllegalArgumentException(
+                    "A slot event cannot occur in slot " + slotIndex + " (min is " + minSlot + ")");
+        }
+    }
+
+    /**
+     * Validates the given item stack to ensure it is within limits for an event.
+     *
+     * @param stack the item stack
+     */
+    private static void validateStack(final ItemStack stack) {
+        if (stack == null) {
+            throw new IllegalArgumentException("A slot event must relate to an item stack.");
+        }
+    }
+
+    /**
+     * Returns the type of event this represents.
      *
      * @return the type
      */
@@ -71,21 +111,33 @@ public final class InventorySlotEvent {
     }
 
     /**
-     * Represents the different types of updates that can occur.
+     * Returns the slot index this event relates to.
+     *
+     * @return the slot index
+     */
+    public int getSlotIndex() {
+        return this.slotIndex;
+    }
+
+    /**
+     * Returns the stack this event relates to.
+     *
+     * @return the item stack
+     */
+    public ItemStack getStack() {
+        return this.stack;
+    }
+
+    /**
+     * Represents the different types of slot events.
      */
     public enum Type {
-        /**
-         * Indicates that the relating slot was removed from an inventory.
-         */
-        REMOVED,
-        /**
-         * Indicates that the relating slot was added to an inventory.
-         */
-        ADDED,
-
-        /**
-         * Indicates that the relating slot was updated in an inventory.
-         */
+        /** Indicates a slot was filled from a previously empty state. */
+        FILLED,
+        /** Indicates a slot was emptied from a previously filled state. */
+        EMPTIED,
+        /** Indicates a slot changed from one filled state to another. */
         CHANGED
     }
+
 }
