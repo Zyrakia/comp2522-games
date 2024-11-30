@@ -77,6 +77,46 @@ public final class ItemStack {
     }
 
     /**
+     * Creates a new stack with the stack size increased by the given amount.
+     * <p>
+     * This method will clamp the new stack size to ensure it is within the {@link ItemStack#MIN_STACK_SIZE} and
+     * {@link ItemStack#MAX_STACK_SIZE}.
+     * <p>
+     * While negative input is not rejected, it is advised to use the {@link ItemStack#minus(int)} method instead.
+     *
+     * @param amount the amount to increase the stack size by
+     * @return the new stack with the increased stack size
+     */
+    public ItemStack plus(final int amount) {
+        int newAmount;
+
+        newAmount = this.getAmount() + amount;
+        newAmount = Math.clamp(newAmount, ItemStack.MIN_STACK_SIZE, ItemStack.MAX_STACK_SIZE);
+
+        return new ItemStack(this.getItem(), newAmount);
+    }
+
+    /**
+     * Creates a new stack with the stack size decreased by the given amount.
+     * <p>
+     * This method will clamp the new stack size to ensure it is within the {@link ItemStack#MIN_STACK_SIZE} and
+     * {@link ItemStack#MAX_STACK_SIZE}.
+     * <p>
+     * While negative input is not rejected, it is advised to use the {@link ItemStack#plus(int)} method instead.
+     *
+     * @param amount the amount to decrease the stack size by
+     * @return the new stack with the decreased stack size
+     */
+    public ItemStack minus(final int amount) {
+        int newAmount;
+
+        newAmount = this.getAmount() - amount;
+        newAmount = Math.clamp(newAmount, ItemStack.MIN_STACK_SIZE, ItemStack.MAX_STACK_SIZE);
+
+        return new ItemStack(this.getItem(), newAmount);
+    }
+
+    /**
      * Returns whether this stack is currently holding the minimum quantity. If it is, removing any will throw an
      * exception.
      *
