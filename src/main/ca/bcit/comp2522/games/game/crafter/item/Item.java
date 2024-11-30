@@ -1,9 +1,5 @@
 package ca.bcit.comp2522.games.game.crafter.item;
 
-import javafx.scene.image.Image;
-
-import java.net.URI;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,11 +12,6 @@ import java.util.Objects;
  */
 public final class Item {
 
-    private static final Path TEXTURE_DIR = Path.of("src", "resources", "textures");
-    private static final String TEXTURE_EXT = "png";
-
-    private static final Image FALLBACK_TEXTURE = Item.generateTexture("fallback");
-
     private static final int MAX_NAME_LEN = 24;
     private static final int MAX_DESC_LEN = 64;
 
@@ -29,16 +20,9 @@ public final class Item {
      */
     private static final Map<String, Item> ITEMS = new HashMap<>();
 
-    static {
-        if (Item.FALLBACK_TEXTURE.isError()) {
-            throw new IllegalStateException("The fallback texture for items was not found.");
-        }
-    }
-
     private final String name;
     private final String description;
     private final String uid;
-    private final Image texture;
 
     /**
      * Creates a new item.
@@ -53,7 +37,6 @@ public final class Item {
         this.name = name;
         this.description = description;
         this.uid = Item.generateId(this.name);
-        this.texture = Item.generateTexture(this.uid);
 
         Item.register(this);
     }
@@ -125,32 +108,6 @@ public final class Item {
     }
 
     /**
-     * Generates the image instance holding the texture associated with the given UID.
-     *
-     * @param uid the uid to get the texture for
-     * @return the generated image holding the associated texture, or null if the texture does not exist
-     */
-    private static Image generateTexture(final String uid) {
-        final URI imageUrl;
-        imageUrl = Item.resolveTexturePath(uid).toUri();
-
-        return new Image(imageUrl.toString());
-    }
-
-    /**
-     * Returns the file path of the texture that is associated with the given UID.
-     *
-     * @param uid the uid to get the file name of
-     * @return the texture file path
-     */
-    private static Path resolveTexturePath(final String uid) {
-        final String fileName;
-        fileName = uid.concat(".").concat(Item.TEXTURE_EXT);
-
-        return Item.TEXTURE_DIR.resolve(fileName);
-    }
-
-    /**
      * Returns the name.
      *
      * @return the name
@@ -175,26 +132,6 @@ public final class Item {
      */
     public String getUID() {
         return this.uid;
-    }
-
-    /**
-     * Returns whether this item has a valid texture. If this returns false, when the texture is obtained it will be
-     * the fallback texture.
-     *
-     * @return whether this item has a valid texture
-     */
-    public boolean hasTexture() {
-        return this.texture != null && !this.texture.isError();
-    }
-
-    /**
-     * Returns the texture.
-     *
-     * @return the texture
-     */
-    public Image getTexture() {
-        if (this.hasTexture()) return this.texture;
-        return Item.FALLBACK_TEXTURE;
     }
 
     @Override
