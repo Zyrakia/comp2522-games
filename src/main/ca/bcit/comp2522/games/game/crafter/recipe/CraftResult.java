@@ -2,7 +2,6 @@ package ca.bcit.comp2522.games.game.crafter.recipe;
 
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
 
-
 /**
  * Represents the result of crafting a recipe.
  *
