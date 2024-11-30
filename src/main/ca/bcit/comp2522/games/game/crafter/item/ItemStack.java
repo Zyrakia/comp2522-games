@@ -26,14 +26,14 @@ public final class ItemStack {
     /**
      * Creates a new inventory stack holding the specified item.
      *
-     * @param item             the item in this stack
-     * @param initialStackSize the initial size of the stack
+     * @param item      the item in this stack
+     * @param stackSize the amount of items in this stack
      */
-    public ItemStack(final Item item, final int initialStackSize) {
-        ItemStack.validateStackSize(initialStackSize);
+    public ItemStack(final Item item, final int stackSize) {
+        ItemStack.validateStackSize(stackSize);
 
         this.item = item;
-        this.stackSize = initialStackSize;
+        this.stackSize = stackSize;
     }
 
     /**
@@ -72,7 +72,7 @@ public final class ItemStack {
      *
      * @return the stack size
      */
-    public int getStackSize() {
+    public int getAmount() {
         return this.stackSize;
     }
 
