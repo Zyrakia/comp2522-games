@@ -12,10 +12,9 @@ import javafx.scene.Parent;
 public class CrafterMainScreen extends Parent {
 
     private final CrafterGameController gameController;
-    private final PaginatedInventoryRenderer inventoryRenderer;
 
     /**
-     * Creates a new main screen that interacts with the given controller
+     * Creates a new main screen that interacts with the given controller.
      *
      * @param gameController the controller this screen interacts with
      */
@@ -25,9 +24,7 @@ public class CrafterMainScreen extends Parent {
         this.gameController = gameController;
         // TODO HUD
         // TODO crafting grid
-        this.inventoryRenderer = new PaginatedInventoryRenderer(gameController.getInventory());
-
-        this.getChildren().addAll(this.inventoryRenderer);
+        this.getChildren().addAll(new PaginatedInventoryRenderer(gameController.getInventory()));
     }
 
     /**

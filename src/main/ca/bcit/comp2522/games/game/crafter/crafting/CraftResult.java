@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.games.game.crafter.recipe;
+package ca.bcit.comp2522.games.game.crafter.crafting;
 
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
 
