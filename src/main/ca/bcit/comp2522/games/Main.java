@@ -1,6 +1,7 @@
 package ca.bcit.comp2522.games;
 
 import ca.bcit.comp2522.games.game.GameController;
+import ca.bcit.comp2522.games.game.crafter.CrafterGameController;
 import ca.bcit.comp2522.games.game.number.NumberGameController;
 import ca.bcit.comp2522.games.game.quit.QuitGameController;
 import ca.bcit.comp2522.games.game.word.WordGameController;
@@ -69,7 +70,7 @@ public final class Main extends Application {
 
         games.put("W", new WordGameController());
         games.put("N", new NumberGameController());
-        //        games.put("M", new CraftingSimulatorController());
+        games.put("M", new CrafterGameController());
         games.put("Q", new QuitGameController());
 
         return games;

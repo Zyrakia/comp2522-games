@@ -1,6 +1,7 @@
-package ca.bcit.comp2522.games.game.crafter.item;
+package ca.bcit.comp2522.games.game.crafter.gui;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -9,22 +10,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages textures for items based on their UID.
+ * Manages textures based on their UID (the file name without extension).
  *
  * @author Ole Lammers
  * @version 1.0
  */
-public final class ItemTextureManager {
+public final class TextureManager {
+
+    /**
+     * Represents the pixel width and height of each texture.
+     */
+    public static final int DEF_TEXTURE_SIZE = 48;
 
     private static final Path TEXTURE_DIR = Path.of("src", "resources", "textures");
     private static final String TEXTURE_EXT = "png";
     private static final String FALLBACK_TEXTURE_NAME = "fallback";
 
-    private static ItemTextureManager instance;
+    private static TextureManager instance;
 
     static {
-        if (!Files.isDirectory(ItemTextureManager.TEXTURE_DIR)) {
-            throw new IllegalStateException("Item textures directory does not exist.");
+        if (!Files.isDirectory(TextureManager.TEXTURE_DIR)) {
+            throw new IllegalStateException("Textures directory does not exist.");
         }
     }
 
@@ -34,16 +40,16 @@ public final class ItemTextureManager {
     /**
      * Creates the texture manager, loading the fallback texture.
      */
-    private ItemTextureManager() {
-        if (ItemTextureManager.instance != null) {
-            throw new IllegalStateException("Item texture manager has already been initialized.");
+    private TextureManager() {
+        if (TextureManager.instance != null) {
+            throw new IllegalStateException("Texture manager has already been initialized.");
         }
 
-        this.fallbackTexture = this.createAssociatedTexture(ItemTextureManager.FALLBACK_TEXTURE_NAME);
+        this.fallbackTexture = this.createAssociatedTexture(TextureManager.FALLBACK_TEXTURE_NAME);
         this.loadedTextures = new HashMap<>();
 
         if (this.fallbackTexture.isError()) {
-            throw new IllegalStateException("The fallback texture for items was not found.");
+            throw new IllegalStateException("The fallback texture was not found.");
         }
     }
 
@@ -52,12 +58,12 @@ public final class ItemTextureManager {
      *
      * @return the texture manager
      */
-    public static ItemTextureManager getInstance() {
-        if (ItemTextureManager.instance == null) {
-            ItemTextureManager.instance = new ItemTextureManager();
+    public static TextureManager getInstance() {
+        if (TextureManager.instance == null) {
+            TextureManager.instance = new TextureManager();
         }
 
-        return ItemTextureManager.instance;
+        return TextureManager.instance;
     }
 
     /**
@@ -68,9 +74,9 @@ public final class ItemTextureManager {
      */
     private Path resolveTexturePath(final String uid) {
         final String fileName;
-        fileName = uid.concat(".").concat(ItemTextureManager.TEXTURE_EXT);
+        fileName = uid.concat(".").concat(TextureManager.TEXTURE_EXT);
 
-        return ItemTextureManager.TEXTURE_DIR.resolve(fileName);
+        return TextureManager.TEXTURE_DIR.resolve(fileName);
     }
 
     /**
@@ -109,6 +115,23 @@ public final class ItemTextureManager {
 
         this.loadedTextures.put(uid, texture);
         return texture;
+    }
+
+    /**
+     * Generates a {@link ImageView} of the image texture associated with the given UID, with the default texture
+     * size applied.
+     *
+     * @param uid the uid
+     * @return the generated view
+     */
+    public ImageView getRenderedTexture(final String uid) {
+        final ImageView view;
+        view = new ImageView(this.getTexture(uid));
+
+        view.setFitHeight(TextureManager.DEF_TEXTURE_SIZE);
+        view.setFitWidth(TextureManager.DEF_TEXTURE_SIZE);
+
+        return view;
     }
 
 }
