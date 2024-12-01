@@ -4,11 +4,14 @@ import ca.bcit.comp2522.games.game.crafter.item.Item;
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
 import ca.bcit.comp2522.games.util.Observable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Represents an inventory that can contain item stacks.
+ * Represents an inventory that contains item stacks.
  *
  * @author Ole Lammers
  * @version 1.0
@@ -32,7 +35,7 @@ public class Inventory extends Observable<InventoryEvent> {
      *
      * @param stack the item stack
      */
-    private static void validateItemStack(final ItemStack stack) {
+    protected static void validateItemStack(final ItemStack stack) {
         if (stack == null) {
             throw new IllegalArgumentException("Item stack must not be null.");
         }
@@ -43,7 +46,7 @@ public class Inventory extends Observable<InventoryEvent> {
      *
      * @param item the item
      */
-    private static void validateItem(final Item item) {
+    protected static void validateItem(final Item item) {
         if (item == null) {
             throw new IllegalArgumentException("Item must not be null.");
         }
@@ -152,6 +155,33 @@ public class Inventory extends Observable<InventoryEvent> {
      */
     public final ItemStack getStackOf(final Item item) {
         return this.itemStacks.get(item);
+    }
+
+    /**
+     * Returns the amount of item stacks currently inside this inventory.
+     *
+     * @return the item stack count
+     */
+    public final int getSize() {
+        return this.itemStacks.size();
+    }
+
+    /**
+     * Returns a read-only collection of the item stacks within this inventory.
+     *
+     * @return the item stacks in this inventory
+     */
+    public final Collection<ItemStack> getAllStacks() {
+        return Collections.unmodifiableCollection(this.itemStacks.values());
+    }
+
+    /**
+     * Returns a read-only list of the items stacks within this inventory.
+     *
+     * @return the list of item stacks in this inventory
+     */
+    public final List<ItemStack> getAllStacksAsList() {
+        return List.copyOf(this.getAllStacks());
     }
 
 }

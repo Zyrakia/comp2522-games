@@ -30,6 +30,7 @@ public final class ItemStack {
      * @param stackSize the amount of items in this stack
      */
     public ItemStack(final Item item, final int stackSize) {
+        ItemStack.validateItem(item);
         ItemStack.validateStackSize(stackSize);
 
         this.item = item;
@@ -43,6 +44,17 @@ public final class ItemStack {
      */
     public ItemStack(final Item item) {
         this(item, ItemStack.SINGLE_STACK_AMOUNT);
+    }
+
+    /**
+     * Validates the given item to ensure it can be used within an item stack.
+     *
+     * @param item the item
+     */
+    private static void validateItem(final Item item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Item cannot be null");
+        }
     }
 
     /**
@@ -74,6 +86,17 @@ public final class ItemStack {
      */
     public int getAmount() {
         return this.stackSize;
+    }
+
+    /**
+     * Determines whether this item stack is made up of the specified item.
+     *
+     * @param item the item
+     * @return whether this stack contains the item
+     */
+    public boolean contains(final Item item) {
+        ItemStack.validateItem(item);
+        return this.getItem().equals(item);
     }
 
     /**
