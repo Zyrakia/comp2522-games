@@ -29,7 +29,10 @@ public final class CraftingManager {
 
         this.recipes = new ArrayList<>();
 
-        this.recipes.add(new ShapelessRecipe(new ItemStack(Items.GRASS), List.of(Items.DIRT, Items.DIRT, Items.DIRT)));
+        this.recipes.add(
+                new ShapelessRecipe(new ItemStack(Items.GRASS, 2), List.of(Items.DIRT, Items.DIRT, Items.DIRT)));
+        this.recipes.add(ShapedRecipe.compile(new ItemStack(Items.ENCHANTED_GEM, 2), " # #@# # ", Items.REDSTONE,
+                                              Items.DIAMOND));
     }
 
     /**

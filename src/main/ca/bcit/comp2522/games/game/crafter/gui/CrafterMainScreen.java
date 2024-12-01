@@ -1,7 +1,7 @@
 package ca.bcit.comp2522.games.game.crafter.gui;
 
 import ca.bcit.comp2522.games.game.crafter.CrafterGameController;
-import javafx.scene.Parent;
+import javafx.scene.layout.VBox;
 
 /**
  * Represents the main screen of the crafter game.
@@ -9,7 +9,7 @@ import javafx.scene.Parent;
  * @author Ole Lammers
  * @version 1.0
  */
-public class CrafterMainScreen extends Parent {
+public class CrafterMainScreen extends VBox {
 
     private final CrafterGameController gameController;
 
@@ -22,9 +22,10 @@ public class CrafterMainScreen extends Parent {
         CrafterMainScreen.validateGameController(gameController);
 
         this.gameController = gameController;
+
         // TODO HUD
-        // TODO crafting grid
-        this.getChildren().addAll(new PaginatedInventoryRenderer(gameController.getInventory()));
+        this.getChildren().add(new CraftingListGridRenderer(this.gameController.getCraftingList()));
+        this.getChildren().add(new PaginatedInventoryRenderer(this.gameController.getInventory()));
     }
 
     /**

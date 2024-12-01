@@ -28,12 +28,16 @@ public class ItemStackRenderer extends StackPane {
         this.textureManager = TextureManager.getInstance();
         this.stack = stack;
 
-        final Label amountLabel;
-        amountLabel = this.createAmountLabel();
+        this.getStyleClass().add("item-stack-container");
+        this.getChildren().add(this.createItemTexture());
 
-        StackPane.setAlignment(amountLabel, Pos.BOTTOM_RIGHT);
+        if (stack.getAmount() != 1) {
+            final Label amountLabel;
+            amountLabel = this.createAmountLabel();
 
-        this.getChildren().addAll(this.createItemTexture(), amountLabel);
+            StackPane.setAlignment(amountLabel, Pos.BOTTOM_RIGHT);
+            this.getChildren().add(amountLabel);
+        }
     }
 
     /**
@@ -74,7 +78,7 @@ public class ItemStackRenderer extends StackPane {
         amountLabel = new Label();
 
         amountLabel.setText(String.valueOf(this.stack.getAmount()));
-        amountLabel.getStyleClass().add("amount-label");
+        amountLabel.getStyleClass().add("item-amount-label");
 
         return amountLabel;
     }

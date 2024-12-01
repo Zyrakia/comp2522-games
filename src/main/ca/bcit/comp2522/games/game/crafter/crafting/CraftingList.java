@@ -24,6 +24,8 @@ public final class CraftingList extends Observable<CraftResult> {
     private final CraftingManager craftingManager;
     private final List<Item> items;
 
+    private CraftResult currentResult;
+
     /**
      * Creates a new empty crafting list.
      *
@@ -141,9 +143,24 @@ public final class CraftingList extends Observable<CraftResult> {
      * Recalculates potential recipes after an item update.
      */
     private void handleItemsUpdate() {
-        final CraftResult res;
-        res = this.craftingManager.craft(this.items);
-        this.announceUpdate(res);
+        this.currentResult = null;
+        this.announceUpdate(this.getCurrentResult());
+    }
+
+    /**
+     * Returns the current result of this crafting list. If not available, calculates the result.
+     *
+     * @return the current result
+     */
+    public CraftResult getCurrentResult() {
+        if (this.currentResult == null) {
+            final CraftResult res;
+            res = this.craftingManager.craft(this.getItems());
+
+            this.currentResult = res;
+        }
+
+        return this.currentResult;
     }
 
     /**

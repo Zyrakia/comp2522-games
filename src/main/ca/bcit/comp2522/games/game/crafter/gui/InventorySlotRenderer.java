@@ -2,7 +2,7 @@ package ca.bcit.comp2522.games.game.crafter.gui;
 
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
 
 /**
  * Renders an item stack as an item slot inside a rendered inventory.
@@ -10,7 +10,7 @@ import javafx.scene.layout.StackPane;
  * @author Ole Lammers
  * @version 1.0
  */
-public class InventorySlotRenderer extends StackPane {
+public class InventorySlotRenderer extends Pane {
 
     private static final String SLOT_TEXTURE_UID = "slot";
 
@@ -30,6 +30,8 @@ public class InventorySlotRenderer extends StackPane {
         if (stack != null) {
             this.getChildren().add(new ItemStackRenderer(stack));
         }
+
+        // TODO label on hover
     }
 
     /**

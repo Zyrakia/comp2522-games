@@ -30,13 +30,22 @@
     -fx-translate-y: 0.5;
 }
 
-.amount-label {
+.item-amount-label {
     -fx-text-fill: white;
     -fx-font-size: 14;
     -fx-font-weight: bold;
 
-    -fx-translate-y: -10;
+    -fx-translate-y: -6;
     -fx-translate-x: -10;
 
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 4, 0.7, 1, 1);
+}
+
+.crafting-container {
+    -fx-spacing: 58;
+}
+
+.ingredients-grid {
+    -fx-hgap: 5;
+    -fx-vgap: 5;
 }

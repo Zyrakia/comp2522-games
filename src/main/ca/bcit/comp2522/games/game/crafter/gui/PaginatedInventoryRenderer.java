@@ -2,9 +2,7 @@ package ca.bcit.comp2522.games.game.crafter.gui;
 
 import ca.bcit.comp2522.games.game.crafter.inventory.InventoryEvent;
 import ca.bcit.comp2522.games.game.crafter.inventory.PaginatedInventory;
-import ca.bcit.comp2522.games.game.crafter.item.Item;
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
-import ca.bcit.comp2522.games.util.Observer;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -19,7 +17,7 @@ import java.util.List;
  * @author Ole Lammers
  * @version 1.0
  */
-public final class PaginatedInventoryRenderer extends HBox implements Observer<InventoryEvent> {
+public final class PaginatedInventoryRenderer extends HBox {
 
     private final PaginatedInventory inventory;
     private final HBox pageContainer;
@@ -54,7 +52,6 @@ public final class PaginatedInventoryRenderer extends HBox implements Observer<I
 
         if (this.sceneProperty().isNotNull().get()) {
             this.attachToInventory();
-            this.renderCurrentPage();
         }
     }
 
@@ -143,13 +140,15 @@ public final class PaginatedInventoryRenderer extends HBox implements Observer<I
         }
     }
 
-    @Override
-    public void handleUpdate(final InventoryEvent value) {
-        final Item item;
+    /**
+     * Re-renders the inventory to handle an update within the connected inventory.
+     *
+     * @param e the inventory event, unused
+     */
+    private void handleInventoryUpdate(final InventoryEvent e) {
         final boolean isPageNowInvalid;
         final boolean doesRequireRender;
 
-        item = value.getStack().getItem();
         isPageNowInvalid = this.currentPage > this.inventory.getMaxPageIndex();
 
         if (isPageNowInvalid) this.clampCurrentPage();
@@ -203,7 +202,7 @@ public final class PaginatedInventoryRenderer extends HBox implements Observer<I
      * up to date.
      */
     private void attachToInventory() {
-        this.inventory.observe(this);
+        this.inventory.observe(this::handleInventoryUpdate);
         this.clampCurrentPage();
         this.renderCurrentPage();
     }
@@ -212,7 +211,7 @@ public final class PaginatedInventoryRenderer extends HBox implements Observer<I
      * Detaches from the inventory, disabling automatic rendering based on updates from the inventory.
      */
     private void detachFromInventory() {
-        this.inventory.unobserve(this);
+        this.inventory.unobserve(this::handleInventoryUpdate);
     }
 
     /**
