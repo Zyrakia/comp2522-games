@@ -151,10 +151,9 @@ public final class PaginatedInventoryRenderer extends HBox implements Observer<I
 
         item = value.getStack().getItem();
         isPageNowInvalid = this.currentPage > this.inventory.getMaxPageIndex();
-        doesRequireRender = isPageNowInvalid || this.inventory.isItemOnPage(item, this.currentPage);
 
         if (isPageNowInvalid) this.clampCurrentPage();
-        if (doesRequireRender) this.renderCurrentPage();
+        this.renderCurrentPage();
     }
 
     /**

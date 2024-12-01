@@ -28,7 +28,7 @@ public class InventorySlotRenderer extends StackPane {
 
         this.getChildren().add(this.createSlotTexture());
         if (stack != null) {
-            this.getChildren().add(this.createItemTexture());
+            this.getChildren().add(new ItemStackRenderer(stack));
         }
     }
 
@@ -40,27 +40,6 @@ public class InventorySlotRenderer extends StackPane {
     private ImageView createSlotTexture() {
         final ImageView texture;
         texture = this.textureManager.getRenderedTexture(InventorySlotRenderer.SLOT_TEXTURE_UID);
-        return texture;
-    }
-
-    /**
-     * Creates the item texture.
-     *
-     * @return the created texture
-     */
-    private ImageView createItemTexture() {
-        if (this.stack == null) {
-            return null;
-        }
-
-        final String itemUID;
-        final ImageView texture;
-
-        itemUID = this.stack.getItem().getUID();
-        texture = this.textureManager.getRenderedTexture(itemUID);
-
-        texture.getStyleClass().add("item-texture");
-
         return texture;
     }
 
