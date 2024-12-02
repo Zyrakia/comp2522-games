@@ -1,0 +1,26 @@
+Lesson 1: Overloading, Static, Constructors
+    - All used in A LOT OF PLACES, e.g. ItemStack constructor overloading, ShapedRecipe.compile static helpers
+Lesson 2: Inheritance, Exceptions, Files
+    - Used all over the place as well, especially inheriting from the default JavaFX nodes to create custom renderers
+    - Prime examples of inheritance: PaginatedInventory
+Lesson 3: Polymorphism, Substitution
+    - Primarily used in the recipe class, substitution between ShapedRecipe and ShapelessRecipe (CraftingManager)
+Lesson 4: Abstract, Interfaces, equals() & hashCode()
+    - The Recipe class is abstract
+    - Item uses `equals` and `hashCode`
+Lesson 5: Arrays, Collections
+    - Collections are used all over the place (Inventory, PaginatedInventory, Recipe)
+Lesson 6: Lambda Expressions
+    - Used all over the place, lots of method references in the renderers as well (HarvesterRenderer, ShapelessRecipe)
+Lesson 7: Random, Streams
+    - Random used in the Harvester for drops
+Lesson 8: JavaFX
+    - Throughout the whole game
+Lesson 9: Unit Testing
+    - RecipeTest
+Lesson 10: Design Patterns
+    - Observer pattern implemented throughout the game, Observer and Observable under utils
+    - Singleton with CraftingManager and Items
+Lesson 11: Concurrency
+    - GameController launch method is synchronized to ensure a thread has a hold on the game
+Lesson 12: N/A (Review)

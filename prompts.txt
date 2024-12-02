@@ -1,0 +1,14 @@
+This project has been quite the short but gruesome journey. Minecraft sparked my love for programming back in the day,
+so I wanted to pay homage, but I also love merge games, so I wanted to create a really grindy merge game that takes
+inspiration from Minecraft crafting mechanics.
+
+I used AI throughout this project to quickly get me out of roadblocks. I wanted the idea to stay my own though. While
+implementing, it was super helpful to be able to use ChatGPT as a sort of "documentation browser", JavaFX documentation
+is pretty sparse, especially the CSS side, so that was absolutely the biggest help.
+
+ChatGPT often led me in the wrong direction though. It often didn't understand the complex UI structure I had created.
+Sometimes it would try creating whole new classes, reference methods that did not exist, or even just tell me the wrong
+information.
+
+For example, getting the item to follow the mouse cursor required a lot of tinkering by myself, because ChatGPT
+kept trying to convince me that a transparent pane could capture mouse events, which it can't.
