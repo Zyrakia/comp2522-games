@@ -48,6 +48,8 @@
 }
 
 .item-meta-container {
+    /* to make it align to the background texture */
+    -fx-padding: 23 40;
 }
 
 .item-name {
@@ -69,4 +71,10 @@
 .ingredients-grid {
     -fx-hgap: -v-default-gap;
     -fx-vgap: -v-default-gap;
+}
+
+.harvester-container {
+    -fx-alignment: center;
+    /* to make it align to the background texture */
+    -fx-translate-y: 5;
 }

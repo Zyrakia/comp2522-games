@@ -7,7 +7,10 @@ import ca.bcit.comp2522.games.game.crafter.gui.CrafterMainScreen;
 import ca.bcit.comp2522.games.game.crafter.inventory.PaginatedInventory;
 import ca.bcit.comp2522.games.game.crafter.item.Item;
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
+import ca.bcit.comp2522.games.game.crafter.item.Items;
 import javafx.scene.Parent;
+
+import java.util.Map;
 
 /**
  * Represents the controller for the third game, Crafter, which is the third game.
@@ -18,9 +21,16 @@ import javafx.scene.Parent;
 public final class CrafterGameController extends GuiGameController {
 
     private static final int INV_PAGE_SIZE = 9;
+    private static final int HARVESTER_STAGES = 4;
+
+    private static final Map.Entry<ItemStack, Double> DIRT_DROP = Map.entry(new ItemStack(Items.DIRT), 0.5);
+    private static final Map.Entry<ItemStack, Double> DBL_DIRT_DROP = Map.entry(new ItemStack(Items.DIRT, 2), 0.25);
+    private static final Map.Entry<ItemStack, Double> COBBLE_DROP = Map.entry(new ItemStack(Items.COBBLESTONE), 0.25);
+    private static final Map<ItemStack, Double> DEFAULT_DROPS = Map.ofEntries(DIRT_DROP, DBL_DIRT_DROP, COBBLE_DROP);
 
     private final PaginatedInventory inventory;
     private final CraftingList craftingList;
+    private final Harvester harvester;
 
     /**
      * Creates a new crafter game controller.
@@ -30,6 +40,7 @@ public final class CrafterGameController extends GuiGameController {
 
         this.inventory = new PaginatedInventory(CrafterGameController.INV_PAGE_SIZE);
         this.craftingList = new CraftingList(CrafterGameController.INV_PAGE_SIZE);
+        this.harvester = new Harvester(CrafterGameController.DEFAULT_DROPS, CrafterGameController.HARVESTER_STAGES);
 
         this.addStylesheet("crafter.css");
     }
@@ -45,6 +56,15 @@ public final class CrafterGameController extends GuiGameController {
 
     @Override
     protected void onFinish() {
+    }
+
+    /**
+     * Returns the harvester.
+     *
+     * @return the harvester
+     */
+    public Harvester getHarvester() {
+        return this.harvester;
     }
 
     /**
@@ -124,6 +144,20 @@ public final class CrafterGameController extends GuiGameController {
         }
 
         this.inventory.addItemStack(new ItemStack(removedItem));
+    }
+
+    /**
+     * Performs a harvest and adds the result (if any) to the inventory.
+     */
+    public void performHarvest() {
+        final ItemStack result;
+        result = this.harvester.harvest();
+
+        if (result == null) {
+            return;
+        }
+
+        this.inventory.addItemStack(result);
     }
 
 }

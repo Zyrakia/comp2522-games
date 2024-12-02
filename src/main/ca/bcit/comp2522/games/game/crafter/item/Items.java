@@ -9,7 +9,7 @@ package ca.bcit.comp2522.games.game.crafter.item;
 public final class Items {
 
     /** Tier 1 - Dirt. */
-    public static final Item DIRT = new Item("Dirt", "Not much to say about it.");
+    public static final Item DIRT = new Item("Dirt", "Not much to say about.");
 
     /** Tier 1 - Grass. */
     public static final Item GRASS = new Item("Grass", "Looks nice, doesn’t it?");

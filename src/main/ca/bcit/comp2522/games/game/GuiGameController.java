@@ -18,11 +18,17 @@ import java.util.Set;
  */
 public abstract class GuiGameController extends GameController {
 
+    /**
+     * Represents the fixed width of a GUI game window.
+     */
+    public static final int WIDTH = 600;
+
+    /**
+     * Represents the fixed height of a GUI game window.
+     */
+    public static final int HEIGHT = 400;
+
     private static final Path STYLES_DIR = Path.of("src", "resources", "styles");
-
-    private static final int WIDTH = 600;
-    private static final int HEIGHT = 400;
-
     private final Stage stage;
 
     private final FileWatcher stylesheetWatcher;

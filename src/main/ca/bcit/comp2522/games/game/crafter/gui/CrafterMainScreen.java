@@ -1,5 +1,6 @@
 package ca.bcit.comp2522.games.game.crafter.gui;
 
+import ca.bcit.comp2522.games.game.GuiGameController;
 import ca.bcit.comp2522.games.game.crafter.CrafterGameController;
 import ca.bcit.comp2522.games.game.crafter.gui.event.CraftingSlotClickEvent;
 import ca.bcit.comp2522.games.game.crafter.gui.event.InventorySlotClickEvent;
@@ -7,9 +8,11 @@ import ca.bcit.comp2522.games.game.crafter.gui.event.InventorySlotHoverEvent;
 import ca.bcit.comp2522.games.game.crafter.gui.event.ResultSlotClickEvent;
 import ca.bcit.comp2522.games.game.crafter.item.Item;
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 
@@ -21,8 +24,20 @@ import javafx.scene.layout.StackPane;
  */
 public final class CrafterMainScreen extends StackPane {
 
+    private static final ImageView BACKGROUND;
+
+    static {
+        BACKGROUND = TextureManager.getInstance().getRenderedTexture("background");
+        BACKGROUND.setFitWidth(GuiGameController.WIDTH);
+        BACKGROUND.setFitHeight(GuiGameController.HEIGHT);
+    }
+
     private final CrafterGameController gameController;
     private final CrafterHud hud;
+
+    private final HarvesterRenderer harvesterRenderer;
+    private final CraftingListGridRenderer craftingGridRenderer;
+    private final PaginatedInventoryRenderer inventoryRenderer;
 
     private Item heldItem;
     private ItemStackRenderer heldItemRenderer;
@@ -37,32 +52,23 @@ public final class CrafterMainScreen extends StackPane {
 
         this.gameController = gameController;
         this.hud = new CrafterHud();
+        this.harvesterRenderer = new HarvesterRenderer(this.gameController.getHarvester(),
+                                                       HarvesterRenderer::defaultTextureProvider);
+        this.craftingGridRenderer = new CraftingListGridRenderer(this.gameController.getCraftingList());
+        this.inventoryRenderer = new PaginatedInventoryRenderer(this.gameController.getInventory());
 
-        final CraftingListGridRenderer craftingGridRenderer;
-        final PaginatedInventoryRenderer inventoryRenderer;
-
-        craftingGridRenderer = new CraftingListGridRenderer(this.gameController.getCraftingList());
-        inventoryRenderer = new PaginatedInventoryRenderer(this.gameController.getInventory());
-
-        craftingGridRenderer.addEventHandler(CraftingSlotClickEvent.EVENT, this::handleCraftSlotClick);
-        craftingGridRenderer.addEventHandler(ResultSlotClickEvent.EVENT, (_) -> this.gameController.attemptCraft());
-        inventoryRenderer.addEventHandler(InventorySlotClickEvent.EVENT, this::handleInventorySlotClick);
+        this.craftingGridRenderer.addEventHandler(CraftingSlotClickEvent.EVENT, this::handleCraftSlotClick);
+        this.craftingGridRenderer.addEventHandler(ResultSlotClickEvent.EVENT,
+                                                  (_) -> this.gameController.attemptCraft());
+        this.inventoryRenderer.addEventHandler(InventorySlotClickEvent.EVENT, this::handleInventorySlotClick);
+        this.harvesterRenderer.setOnMouseClicked((_) -> this.gameController.performHarvest());
 
         this.setOnMouseMoved(this::handleGlobalMouseMove);
         this.setOnMouseClicked(this::handleGlobalMouseClick);
         this.addEventHandler(InventorySlotHoverEvent.HOVER, this::handleSlotHoverChange);
         this.addEventHandler(InventorySlotHoverEvent.UNHOVER, this::handleSlotHoverChange);
 
-        final GridPane root;
-        root = new GridPane();
-
-        root.getStyleClass().add("crafter-root");
-        root.addRow(root.getRowCount(), this.hud);
-        root.addRow(root.getRowCount() + 1, craftingGridRenderer);
-        root.addRow(root.getRowCount() + 1, inventoryRenderer);
-        GridPane.setVgrow(this.hud, Priority.ALWAYS);
-
-        this.getChildren().add(root);
+        this.getChildren().addAll(CrafterMainScreen.BACKGROUND, this.createRoot());
     }
 
     /**
@@ -76,6 +82,27 @@ public final class CrafterMainScreen extends StackPane {
         }
     }
 
+    private GridPane createRoot() {
+        final GridPane root;
+        final HBox topPane;
+
+        root = new GridPane();
+        topPane = new HBox();
+
+        final double topPaneHudPerc = 0.67;
+        final double topPaneHarvesterPerc = 0.33;
+
+        this.hud.prefWidthProperty().bind(topPane.widthProperty().multiply(topPaneHudPerc));
+        this.harvesterRenderer.prefWidthProperty().bind(topPane.widthProperty().multiply(topPaneHarvesterPerc));
+        topPane.getChildren().addAll(this.hud, this.harvesterRenderer);
+
+        root.getStyleClass().add("crafter-root");
+        root.addRow(root.getRowCount(), topPane);
+        root.addRow(root.getRowCount() + 1, this.craftingGridRenderer);
+        root.addRow(root.getRowCount() + 1, this.inventoryRenderer);
+        GridPane.setVgrow(topPane, Priority.ALWAYS);
+    }
+
     /**
      * Handles a slot hover or unhover event, updating the HUD accordingly.
      *
@@ -83,7 +110,7 @@ public final class CrafterMainScreen extends StackPane {
      */
     private void handleSlotHoverChange(final InventorySlotHoverEvent event) {
         if (!event.isHovered()) {
-            this.hud.selectItem(null);
+            this.hud.selectItem(this.heldItem);
             return;
         }
 
@@ -93,7 +120,7 @@ public final class CrafterMainScreen extends StackPane {
         slotStack = event.getContainedStack();
 
         if (slotStack == null) {
-            hoveredItem = null;
+            hoveredItem = this.heldItem;
         } else {
             hoveredItem = slotStack.getItem();
         }
@@ -161,7 +188,7 @@ public final class CrafterMainScreen extends StackPane {
             return;
         }
 
-        // By default, the item is centered, so we need to offset it
+        // By default, the item is centered (stack pane), so we need to offset it
         renderer.setTranslateX(localX - this.getWidth() / 2);
         renderer.setTranslateY(localY - this.getHeight() / 2);
     }
