@@ -82,6 +82,11 @@ public final class CrafterMainScreen extends StackPane {
         }
     }
 
+    /**
+     * Creates the root layout for the main screen and inserts all the elements of the main screen into it.
+     *
+     * @return the root layout
+     */
     private GridPane createRoot() {
         final GridPane root;
         final HBox topPane;
@@ -101,6 +106,8 @@ public final class CrafterMainScreen extends StackPane {
         root.addRow(root.getRowCount() + 1, this.craftingGridRenderer);
         root.addRow(root.getRowCount() + 1, this.inventoryRenderer);
         GridPane.setVgrow(topPane, Priority.ALWAYS);
+
+        return root;
     }
 
     /**
@@ -162,6 +169,13 @@ public final class CrafterMainScreen extends StackPane {
             this.gameController.removeCraftingIngredient(ingredientIndex);
         } else {
             this.gameController.addCraftingIngredient(this.heldItem, ingredientIndex);
+
+            final ItemStack remainingStack;
+            remainingStack = this.gameController.getInventory().getStackOf(this.heldItem);
+
+            if (remainingStack == null) {
+                this.setHeldItem(null);
+            }
         }
     }
 

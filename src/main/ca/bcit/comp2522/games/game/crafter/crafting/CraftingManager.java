@@ -68,7 +68,7 @@ public final class CraftingManager {
         recipes.add(ShapedRecipe.compile(new ItemStack(Items.STICK, 2), "    #  # ", Items.PLANK));
         recipes.add(ShapedRecipe.compile(new ItemStack(Items.STICK, 2), "     #  #", Items.PLANK));
 
-        recipes.add(ShapedRecipe.compile(new ItemStack(Items.STONE_PICKAXE, 1), "### @    ", Items.STONE, Items.STICK));
+        recipes.add(ShapedRecipe.compile(new ItemStack(Items.STONE_PICKAXE, 1), "### @  @ ", Items.STONE, Items.STICK));
         recipes.add(new ShapelessRecipe(new ItemStack(Items.COAL), Items.STONE, Items.STONE_PICKAXE));
 
         recipes.add(ShapedRecipe.compile(new ItemStack(Items.TORCH, 2), "#  @     ", Items.COAL, Items.STICK));
