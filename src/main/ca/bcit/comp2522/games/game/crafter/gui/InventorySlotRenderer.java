@@ -1,7 +1,10 @@
 package ca.bcit.comp2522.games.game.crafter.gui;
 
+import ca.bcit.comp2522.games.game.crafter.gui.event.InventorySlotClickEvent;
+import ca.bcit.comp2522.games.game.crafter.gui.event.InventorySlotHoverEvent;
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 
 /**
@@ -10,7 +13,7 @@ import javafx.scene.layout.Pane;
  * @author Ole Lammers
  * @version 1.0
  */
-public class InventorySlotRenderer extends Pane {
+public final class InventorySlotRenderer extends Pane {
 
     private static final String SLOT_TEXTURE_UID = "slot";
 
@@ -31,7 +34,16 @@ public class InventorySlotRenderer extends Pane {
             this.getChildren().add(new ItemStackRenderer(stack));
         }
 
-        // TODO label on hover
+        this.getStyleClass().add("slot");
+        this.getStyleClass().add(this.stack == null ? "empty" : "filled");
+
+        this.setOnMouseEntered(_ -> this.fireEvent(InventorySlotHoverEvent.hovered(this.stack)));
+        this.setOnMouseExited(_ -> this.fireEvent(InventorySlotHoverEvent.unhovered(this.stack)));
+        this.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) {
+                this.fireEvent(new InventorySlotClickEvent(this.stack));
+            }
+        });
     }
 
     /**

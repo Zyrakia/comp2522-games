@@ -1,6 +1,7 @@
 package ca.bcit.comp2522.games.game.crafter;
 
 import ca.bcit.comp2522.games.game.GuiGameController;
+import ca.bcit.comp2522.games.game.crafter.crafting.CraftResult;
 import ca.bcit.comp2522.games.game.crafter.crafting.CraftingList;
 import ca.bcit.comp2522.games.game.crafter.gui.CrafterMainScreen;
 import ca.bcit.comp2522.games.game.crafter.inventory.PaginatedInventory;
@@ -36,12 +37,6 @@ public final class CrafterGameController extends GuiGameController {
         this.craftingList = new CraftingList(CrafterGameController.INV_PAGE_SIZE);
 
         this.populateWithDemoItems();
-        this.craftingList.setItem(Items.REDSTONE, 1);
-        this.craftingList.setItem(Items.REDSTONE, 3);
-        this.craftingList.setItem(Items.DIAMOND, 4);
-        this.craftingList.setItem(Items.REDSTONE, 5);
-        this.craftingList.setItem(Items.REDSTONE, 7);
-        
         this.addStylesheet("crafter.css");
     }
 
@@ -92,6 +87,67 @@ public final class CrafterGameController extends GuiGameController {
             int amount = random.nextInt(ItemStack.MAX_STACK_SIZE) + 1;
             this.inventory.addItemStack(new ItemStack(item, amount));
         }
+    }
+
+    /**
+     * Attempts to craft with the current ingredients of the crafting list.
+     */
+    public void attemptCraft() {
+        final CraftResult result;
+        result = this.craftingList.getCurrentResult();
+
+        if (result == null || !result.isSuccessful()) {
+            return;
+        }
+
+        final ItemStack resultStack;
+        resultStack = result.getStack();
+
+        this.craftingList.clear();
+        this.inventory.addItemStack(resultStack);
+    }
+
+    /**
+     * Adds an item from the inventory to the crafting list at the given index.
+     * <p>
+     * If the item is not in this inventory, nothing happens.
+     *
+     * @param ingredient the ingredient to add
+     * @param index      the index to add the ingredient at
+     */
+    public void addCraftingIngredient(final Item ingredient, final int index) {
+        final int inventoryAmountToRemove;
+        final int inventoryAmountRemoved;
+
+        inventoryAmountToRemove = 1;
+        inventoryAmountRemoved = this.inventory.removeItem(ingredient, inventoryAmountToRemove);
+
+        if (inventoryAmountRemoved != inventoryAmountToRemove) {
+            return;
+        }
+
+        final Item replacedItem;
+        replacedItem = this.craftingList.setItem(ingredient, index);
+
+        if (replacedItem != null) {
+            this.inventory.addItemStack(new ItemStack(replacedItem));
+        }
+    }
+
+    /**
+     * Removes an item from the crafting list, and adds it back into the inventory.
+     *
+     * @param index the index to remove
+     */
+    public void removeCraftingIngredient(final int index) {
+        final Item removedItem;
+        removedItem = this.craftingList.removeItem(index);
+
+        if (removedItem == null) {
+            return;
+        }
+
+        this.inventory.addItemStack(new ItemStack(removedItem));
     }
 
 }

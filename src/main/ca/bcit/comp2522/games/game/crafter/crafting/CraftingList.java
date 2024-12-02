@@ -22,7 +22,7 @@ public final class CraftingList extends Observable<CraftResult> {
     public static final int MIN_SIZE = 1;
 
     private final CraftingManager craftingManager;
-    private final List<Item> items;
+    private final List<Item> ingredients;
 
     private CraftResult currentResult;
 
@@ -33,7 +33,7 @@ public final class CraftingList extends Observable<CraftResult> {
      */
     public CraftingList(final int size) {
         this.craftingManager = CraftingManager.getInstance();
-        this.items = CraftingList.generateEmptyList(size);
+        this.ingredients = CraftingList.generateEmptyList(size);
     }
 
     /**
@@ -84,12 +84,12 @@ public final class CraftingList extends Observable<CraftResult> {
      * @return whether the item could be added, false if the list is full
      */
     public boolean addItem(final Item item) {
-        final int firstFree = this.items.indexOf(null);
+        final int firstFree = this.ingredients.indexOf(null);
         if (firstFree == -1) {
             return false;
         }
 
-        this.items.set(firstFree, item);
+        this.ingredients.set(firstFree, item);
         this.handleItemsUpdate();
 
         return true;
@@ -106,7 +106,7 @@ public final class CraftingList extends Observable<CraftResult> {
         this.validateIndex(index);
 
         final Item replacedItem;
-        replacedItem = this.items.set(index, item);
+        replacedItem = this.ingredients.set(index, item);
 
         this.handleItemsUpdate();
         return replacedItem;
@@ -122,10 +122,27 @@ public final class CraftingList extends Observable<CraftResult> {
         this.validateIndex(index);
 
         final Item removedItem;
-        removedItem = this.items.set(index, null);
+        removedItem = this.ingredients.set(index, null);
 
         this.handleItemsUpdate();
         return removedItem;
+    }
+
+    /**
+     * Removes the index that holds the specified item.
+     *
+     * @param item the item to remove
+     * @return whether the item was removed (whether it was present)
+     */
+    public boolean removeItem(final Item item) {
+        final int index;
+        index = this.ingredients.indexOf(item);
+
+        if (index == -1) {
+            return false;
+        }
+
+        return this.removeItem(index) != null;
     }
 
     /**
@@ -133,7 +150,7 @@ public final class CraftingList extends Observable<CraftResult> {
      */
     public void clear() {
         for (int i = 0; i < this.getCapacity(); i++) {
-            this.items.set(i, null);
+            this.ingredients.set(i, null);
         }
 
         this.handleItemsUpdate();
@@ -155,7 +172,7 @@ public final class CraftingList extends Observable<CraftResult> {
     public CraftResult getCurrentResult() {
         if (this.currentResult == null) {
             final CraftResult res;
-            res = this.craftingManager.craft(this.getItems());
+            res = this.craftingManager.craft(this.getIngredients());
 
             this.currentResult = res;
         }
@@ -168,8 +185,8 @@ public final class CraftingList extends Observable<CraftResult> {
      *
      * @return the current items
      */
-    public List<Item> getItems() {
-        return Collections.unmodifiableList(this.items);
+    public List<Item> getIngredients() {
+        return Collections.unmodifiableList(this.ingredients);
     }
 
     /**
@@ -178,7 +195,7 @@ public final class CraftingList extends Observable<CraftResult> {
      * @return the total capacity
      */
     public int getCapacity() {
-        return this.items.size();
+        return this.ingredients.size();
     }
 
     /**
@@ -187,7 +204,7 @@ public final class CraftingList extends Observable<CraftResult> {
      * @return the amount of free slots
      */
     public int getFreeCapacity() {
-        return (int) this.items.stream().filter(Objects::isNull).count();
+        return (int) this.ingredients.stream().filter(Objects::isNull).count();
     }
 
     /**
@@ -196,7 +213,7 @@ public final class CraftingList extends Observable<CraftResult> {
      * @return whether all slots are occupied by an item
      */
     public boolean isFull() {
-        return this.items.stream().noneMatch(Objects::isNull);
+        return this.ingredients.stream().noneMatch(Objects::isNull);
     }
 
 }

@@ -1,5 +1,11 @@
 .root {
     -fx-font-family: "Courier New", "Consolas", "Lucida Console";
+    -v-default-gap: 5;
+}
+
+.crafter-root {
+    -fx-padding: 5;
+    -fx-vgap: -v-default-gap;
 }
 
 .nav-button {
@@ -11,17 +17,17 @@
     -fx-opacity: 0.75;
 }
 
-.nav-button:hover, .nav-button:selected {
+.slot:hover, .nav-button:hover, .nav-button:selected {
     -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.6), 6, 0.7, 2, 2);
 }
 
-.nav-button:pressed {
+.slot:pressed, .nav-button:pressed {
     -fx-scale-x: 0.95;
     -fx-scale-y: 0.95;
 }
 
 .page-container {
-    -fx-spacing: 5;
+    -fx-spacing: -v-default-gap;
 }
 
 .item-texture {
@@ -41,11 +47,26 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 4, 0.7, 1, 1);
 }
 
+.item-meta-container {
+}
+
+.item-name {
+    -fx-font-weight: bold;
+    -fx-font-size: 24;
+    -fx-underline: true;
+}
+
+.item-desc {
+    -fx-font-size: 16;
+    -fx-wrap-text: true;
+    -fx-padding: 5 0;
+}
+
 .crafting-container {
     -fx-spacing: 58;
 }
 
 .ingredients-grid {
-    -fx-hgap: 5;
-    -fx-vgap: 5;
+    -fx-hgap: -v-default-gap;
+    -fx-vgap: -v-default-gap;
 }

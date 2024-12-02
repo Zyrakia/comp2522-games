@@ -2,6 +2,9 @@ package ca.bcit.comp2522.games.game.crafter.gui;
 
 import ca.bcit.comp2522.games.game.crafter.crafting.CraftResult;
 import ca.bcit.comp2522.games.game.crafter.crafting.CraftingList;
+import ca.bcit.comp2522.games.game.crafter.gui.event.CraftingSlotClickEvent;
+import ca.bcit.comp2522.games.game.crafter.gui.event.InventorySlotClickEvent;
+import ca.bcit.comp2522.games.game.crafter.gui.event.ResultSlotClickEvent;
 import ca.bcit.comp2522.games.game.crafter.item.Item;
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
 import javafx.geometry.Pos;
@@ -22,7 +25,7 @@ import java.util.List;
  */
 public final class CraftingListGridRenderer extends HBox {
 
-    final CraftingList list;
+    final CraftingList craftingList;
     final int dimensionSize;
 
     private final GridPane ingredientsGrid;
@@ -31,11 +34,13 @@ public final class CraftingListGridRenderer extends HBox {
     /**
      * Creates a new square grid renderer for a crafting list.
      *
-     * @param list the crafting list
+     * @param craftingList the crafting list to be rendered
      */
-    public CraftingListGridRenderer(final CraftingList list) {
-        this.list = list;
-        this.dimensionSize = CraftingListGridRenderer.calculateDimensionSize(this.list);
+    public CraftingListGridRenderer(final CraftingList craftingList) {
+        CraftingListGridRenderer.validateCraftingList(craftingList);
+
+        this.craftingList = craftingList;
+        this.dimensionSize = CraftingListGridRenderer.calculateDimensionSize(this.craftingList);
 
         this.ingredientsGrid = this.createIngredientsGrid();
         this.resultContainer = this.createResultContainer();
@@ -54,6 +59,17 @@ public final class CraftingListGridRenderer extends HBox {
 
         if (this.sceneProperty().isNotNull().get()) {
             this.attachToList();
+        }
+    }
+
+    /**
+     * Validates the given crafting list to ensure it can be rendered.
+     *
+     * @param craftingList the crafting list
+     */
+    private static void validateCraftingList(final CraftingList craftingList) {
+        if (craftingList == null) {
+            throw new IllegalArgumentException("A null crafting list cannot be rendered.");
         }
     }
 
@@ -99,6 +115,10 @@ public final class CraftingListGridRenderer extends HBox {
 
         container.setAlignment(Pos.CENTER);
         container.getStyleClass().add("result-slot-container");
+        container.addEventHandler(InventorySlotClickEvent.EVENT, (event) -> {
+            event.consume();
+            this.fireEvent(new ResultSlotClickEvent());
+        });
 
         return container;
     }
@@ -111,8 +131,8 @@ public final class CraftingListGridRenderer extends HBox {
         final List<Item> items;
         final List<InventorySlotRenderer> renderedItems;
 
-        res = this.list.getCurrentResult();
-        items = this.list.getItems();
+        res = this.craftingList.getCurrentResult();
+        items = this.craftingList.getIngredients();
         renderedItems = items.stream().map((item) -> {
             final ItemStack stack;
             if (item == null) {
@@ -130,13 +150,21 @@ public final class CraftingListGridRenderer extends HBox {
         this.resultContainer.getChildren().add(new InventorySlotRenderer(res.getStack()));
 
         for (int i = 0; i < renderedItems.size(); i++) {
+            final int ingredientIndex = i;
             final int row;
             final int col;
+            final InventorySlotRenderer renderer;
 
             row = i / this.dimensionSize;
             col = i % this.dimensionSize;
+            renderer = renderedItems.get(i);
 
-            this.ingredientsGrid.add(renderedItems.get(i), col, row);
+            renderer.addEventHandler(InventorySlotClickEvent.EVENT, (event) -> {
+                event.consume();
+                this.fireEvent(new CraftingSlotClickEvent(ingredientIndex));
+            });
+
+            this.ingredientsGrid.add(renderer, col, row);
         }
     }
 
@@ -154,7 +182,7 @@ public final class CraftingListGridRenderer extends HBox {
      * to date.
      */
     private void attachToList() {
-        this.list.observe(this::handleResultUpdate);
+        this.craftingList.observe(this::handleResultUpdate);
         this.render();
     }
 
@@ -162,7 +190,7 @@ public final class CraftingListGridRenderer extends HBox {
      * Detaches from the list, disabling automatic rendering based on updates from the list.
      */
     private void detachFromList() {
-        this.list.unobserve(this::handleResultUpdate);
+        this.craftingList.unobserve(this::handleResultUpdate);
     }
 
 }

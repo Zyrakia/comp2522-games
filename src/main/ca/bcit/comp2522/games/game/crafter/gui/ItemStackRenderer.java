@@ -12,7 +12,7 @@ import javafx.scene.layout.StackPane;
  * @author Ole Lammers
  * @version 1.0
  */
-public class ItemStackRenderer extends StackPane {
+public final class ItemStackRenderer extends StackPane {
 
     private final TextureManager textureManager;
     private final ItemStack stack;
