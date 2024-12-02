@@ -32,11 +32,11 @@ public final class Items {
     /** Tier 2 - Stick. */
     public static final Item STICK = new Item("Stick", "What’s a tool without one?");
 
-    /** Tier 2 - Coal. */
-    public static final Item COAL = new Item("Coal", "Its warmth might help transform things.");
-
     /** Tier 2 - Stone Pickaxe. */
     public static final Item STONE_PICKAXE = new Item("Stone Pickaxe", "Strong enough to break new ground.");
+
+    /** Tier 2 - Coal. */
+    public static final Item COAL = new Item("Coal", "Its warmth might help transform things.");
 
     /** Tier 2 - Torch. */
     public static final Item TORCH = new Item("Torch", "Brightens your surroundings—literally.");
@@ -44,11 +44,11 @@ public final class Items {
     /** Tier 3 - Iron Ore. */
     public static final Item IRON_ORE = new Item("Iron Ore", "It’s cold and metallic to the touch.");
 
-    /** Tier 3 - Iron Ingot. */
-    public static final Item IRON_INGOT = new Item("Iron Ingot", "Stronger than you might think.");
-
     /** Tier 3 - Charcoal. */
     public static final Item CHARCOAL = new Item("Charcoal", "It’s handmade, after all.");
+
+    /** Tier 3 - Iron Ingot. */
+    public static final Item IRON_INGOT = new Item("Iron Ingot", "Stronger than you might think.");
 
     /** Tier 3 - Iron Pickaxe. */
     public static final Item IRON_PICKAXE = new Item("Iron Pickaxe", "Ready to break through tougher challenges.");
@@ -65,25 +65,22 @@ public final class Items {
     /** Tier 4 - Gold Sword. */
     public static final Item GOLD_SWORD = new Item("Gold Sword", "It looks shiny, but is it practical?");
 
-    /** Tier 5 - Diamond. */
-    public static final Item DIAMOND = new Item("Diamond", "Shimmering brilliance, unmatched by anything else.");
+    /** Tier 5 - Blaze Powder. */
+    public static final Item BLAZE_POWDER = new Item("Blaze Powder", "It burns hot, even in your hand.");
 
     /** Tier 5 - Obsidian. */
     public static final Item OBSIDIAN = new Item("Obsidian", "It feels like it could withstand anything.");
 
-    /** Tier 5 - Enchanted Gem. */
-    public static final Item ENCHANTED_GEM = new Item("Enchanted Gem", "You feel a strange energy emanating from it.");
+    /** Tier 5 - Diamond. */
+    public static final Item DIAMOND = new Item("Diamond", "Shimmering brilliance, unmatched by anything else.");
 
-    /** Tier 5 - Beacon. */
-    public static final Item BEACON = new Item("Beacon", "The peak of craftsmanship. It radiates with pride.");
-
-    /** Tier 6 - Blaze Powder. */
-    public static final Item BLAZE_POWDER = new Item("Blaze Powder", "It burns hot, even in your hand.");
-
-    /** Tier 6 - Nether Brick. */
+    /** Tier 5 - Nether Brick. */
     public static final Item NETHER_BRICK = new Item("Nether Brick", "What mysteries does it hold?");
 
-    /** Tier 6 - Lapis Lazuli. */
-    public static final Item LAPIS_LAZULI = new Item("Lapis Lazuli", "It’s pretty, but is it useful?");
+    /** Tier 6 - Beacon. */
+    public static final Item BEACON = new Item("Beacon", "The peak of craftsmanship. It radiates with pride.");
+
+    /** Tier 5 - Enchanted Gem. */
+    public static final Item ENCHANTED_GEM = new Item("Enchanted Gem", "You feel a strange energy emanating from it.");
 
 }

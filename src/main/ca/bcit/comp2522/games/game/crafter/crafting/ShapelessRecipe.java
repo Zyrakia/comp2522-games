@@ -3,6 +3,7 @@ package ca.bcit.comp2522.games.game.crafter.crafting;
 import ca.bcit.comp2522.games.game.crafter.item.Item;
 import ca.bcit.comp2522.games.game.crafter.item.ItemStack;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,16 @@ public final class ShapelessRecipe extends Recipe {
 
         ShapelessRecipe.validateIngredients(ingredients);
         this.decomposedIngredients = ShapelessRecipe.decomposeIngredients(ingredients);
+    }
+
+    /**
+     * Creates a new shapeless recipe.
+     *
+     * @param result      the result of the recipe
+     * @param ingredients the ingredients required to craft this recipe.
+     */
+    public ShapelessRecipe(final ItemStack result, final Item... ingredients) {
+        this(result, Arrays.asList(ingredients));
     }
 
     /**
